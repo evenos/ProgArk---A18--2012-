@@ -1,0 +1,13 @@
+#git ignore file
+
+#Files
+*.class
+.classpath
+.project
+
+#Folders
+.settings/
+assets/
+bin/
+gen/
+res/
