@@ -29,6 +29,8 @@ public class TowerDefenceActivity extends SimpleBaseGameActivity {
 	private float displayWidth;
 	/**Texture region for smily face*/
 	private ITextureRegion faceTextureRegion;
+	
+	//liten kommentar
 
 	public EngineOptions onCreateEngineOptions() {
 		final Display mDisplay = getWindowManager().getDefaultDisplay();
