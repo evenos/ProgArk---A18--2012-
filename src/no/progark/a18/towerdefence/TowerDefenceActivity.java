@@ -20,6 +20,11 @@ import android.util.Log;
 import android.view.Display;
 
 public class TowerDefenceActivity extends SimpleBaseGameActivity {
+	
+	/*
+	 * DETTE ER EN TEST, HILSEN NJAAL
+	 */
+	
 	/** Debug tag */
 	private final static String TAG = "no.ProgArk.A18.TowerDefence";
 
