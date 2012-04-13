@@ -3,21 +3,23 @@ package no.progark.a18.towerdefence;
 import java.util.LinkedList;
 import java.util.List;
 
+import no.progark.a18.towerdefence.logic.MainMenu;
+import no.progark.a18.towerdefence.logic.State;
+
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.scene.Scene;
-import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.util.FPSLogger;
 import org.andengine.input.touch.TouchEvent;
+import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
-import org.andengine.util.color.Color;
 
 import android.util.Log;
 import android.view.Display;
@@ -57,10 +59,12 @@ public class TowerDefenceActivity extends SimpleBaseGameActivity {
 
 	@Override
 	protected void onCreateResources() {
+		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
+		FontFactory.setAssetBasePath("font/");
+		
 		BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(
 				getTextureManager(), 32, 32,
 				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
 		faceTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createFromAsset(bitmapTextureAtlas, this, "face_box.png", 0, 0);
 
@@ -71,8 +75,7 @@ public class TowerDefenceActivity extends SimpleBaseGameActivity {
 	protected Scene onCreateScene() {
 		getEngine().registerUpdateHandler(new FPSLogger());
 
-		final no.progark.a18.towerdefence.Scene menu = new MainMenu();
-		menu.setBackground(new Background(Color.BLUE));
+		final no.progark.a18.towerdefence.logic.Scene menu = new MainMenu(this);
 
 		/*
 		 * Calculate the coordinates for the face, so its centered on the

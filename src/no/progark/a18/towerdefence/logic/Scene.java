@@ -1,4 +1,4 @@
-package no.progark.a18.towerdefence;
+package no.progark.a18.towerdefence.logic;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -6,7 +6,7 @@ import java.util.TreeMap;
 /**
  * A general scene used to represent the background and base context container.
  */
-public abstract class Scene extends State{
+public abstract class Scene extends State implements LoadableResource{
 	private Scene nextScene;
 	private Map<String, Layer> layers;
 	

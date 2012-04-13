@@ -1,4 +1,4 @@
-package no.progark.a18.towerdefence;
+package no.progark.a18.towerdefence.logic;
 
 
 import org.andengine.entity.Entity;

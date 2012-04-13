@@ -1,4 +1,4 @@
-package no.progark.a18.towerdefence;
+package no.progark.a18.towerdefence.logic;
 
 import java.util.Iterator;
 import java.util.LinkedList;
