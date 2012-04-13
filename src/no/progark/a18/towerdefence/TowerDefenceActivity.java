@@ -1,5 +1,8 @@
 package no.progark.a18.towerdefence;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
@@ -27,13 +30,15 @@ public class TowerDefenceActivity extends SimpleBaseGameActivity {
 	
 	/** Debug tag */
 	private final static String TAG = "no.ProgArk.A18.TowerDefence";
-
+	
 	/**The height of the devise display*/
 	private float displayHeight;
 	/**The width of the devise display*/
 	private float displayWidth;
 	/**Texture region for smily face*/
 	private ITextureRegion faceTextureRegion;
+	/**The stack of states that manages the states of the game*/
+	private List<State> states = new LinkedList<State>();
 	
 	//liten kommentar
 
@@ -66,8 +71,8 @@ public class TowerDefenceActivity extends SimpleBaseGameActivity {
 	protected Scene onCreateScene() {
 		getEngine().registerUpdateHandler(new FPSLogger());
 
-		final Scene scene = new Scene();
-		scene.setBackground(new Background(Color.BLUE));
+		final no.progark.a18.towerdefence.Scene menu = new MainMenu();
+		menu.setBackground(new Background(Color.BLUE));
 
 		/*
 		 * Calculate the coordinates for the face, so its centered on the
@@ -88,10 +93,32 @@ public class TowerDefenceActivity extends SimpleBaseGameActivity {
 			}
 		};
 		face.setScale(4f);
-		scene.attachChild(face);
-		scene.registerTouchArea(face);
+		menu.attachChild(face);
+		menu.registerTouchArea(face);
 
+		states.add(menu);
+		
+		return menu;
+	}
+	
+	public void pushState(State state){
+		if(states != null){
+			states.add(state);
+			getEngine().setScene(state);
+		}
+	}
+	
+	public State popState(){
+		State scene = states.isEmpty() ? null : states.remove(0);
+		
+		if(states != null)
+			getEngine().setScene(scene);
+		
 		return scene;
+	}
+	
+	public State peekState(){
+		return states.isEmpty() ? null : states.get(0);
 	}
 
 }
