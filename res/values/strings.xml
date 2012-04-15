@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, TowerDefenceActivity!</string>
+    <string name="app_name">TowerDefence</string>
+    <string name="exit">Exit</string>
+    <string name="playLevelOne">Play level 1</string>
+    <string name="returnToMain">Exit to main menu</string>
+
+</resources>
