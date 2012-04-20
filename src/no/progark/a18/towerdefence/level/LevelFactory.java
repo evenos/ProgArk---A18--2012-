@@ -30,7 +30,8 @@ public class LevelFactory {
 	public static Scene getLevel(String id) {
 		if ("1".equals(id))
 			return new StaticLevel1(TDA);
-
+		if ("2".equals(id))
+		return new FirstLevel(TDA);
 		// TODO: Load from local fileSystem
 
 		return null;

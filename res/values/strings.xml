@@ -6,5 +6,6 @@
     <string name="exit">Exit</string>
     <string name="playLevelOne">Play level 1</string>
     <string name="returnToMain">Exit to main menu</string>
+    <string name="PlayLevelTwo">Spell</string>
 
 </resources>
