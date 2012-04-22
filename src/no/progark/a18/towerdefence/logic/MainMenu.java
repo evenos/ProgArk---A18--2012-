@@ -22,14 +22,13 @@ import android.util.Log;
 public class MainMenu extends Scene {
 	private final static String TAG = MainMenu.class.getName();
 	private final TowerDefenceActivity TDA;
-	private final Background BACKGROUND = new Background(new Color(0.9f, 0.9f,
-			0.9f));
+	private final Background BACKGROUND = new Background(Color.WHITE);
 
 	private Font exitFont;
 	private BitmapTextureAtlas fontTexture;
 
 	private Text exit;
-	private Text level1;
+	private Text level1, level2;	
 
 	public MainMenu(final TowerDefenceActivity tda) {
 		super();
@@ -70,6 +69,19 @@ public class MainMenu extends Scene {
 		};
 		this.registerTouchArea(level1);
 		this.attachChild(level1);
+		
+		//Level 2 text
+		level2 = new Text(50, 250, this.exitFont, TDA.getResources().getString(R.string.PlayLevelTwo), tda.getVertexBufferObjectManager()){
+			@Override
+			public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
+					float pTouchAreaLocalX, float pTouchAreaLocalY) {
+				Log.d(TAG, "Level1 button, pushing level1");
+				TDA.pushState(LevelFactory.getLevel("2"));
+				return true;
+			}
+		};
+		this.registerTouchArea(level2);
+		this.attachChild(level2);
 	}
 			
 	public void loadResourses(final BaseGameActivity tda) {
@@ -78,7 +90,7 @@ public class MainMenu extends Scene {
 
 		this.exitFont = FontFactory.createFromAsset(tda.getFontManager(),
 				this.fontTexture, tda.getAssets(), "Sabatica-regular.ttf", 48,
-				true, Color.GREEN.getABGRPackedInt());
+				true, Color.BLACK.getABGRPackedInt());
 		tda.getEngine().getTextureManager().loadTexture(this.fontTexture);
 		tda.getFontManager().loadFont(this.exitFont);
 

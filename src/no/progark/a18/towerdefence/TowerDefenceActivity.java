@@ -35,6 +35,15 @@ public class TowerDefenceActivity extends SimpleBaseGameActivity {
 	
 	/**The height of the devise display*/
 	private float displayHeight;
+	public float getDisplayHeight() {
+		return displayHeight;
+	}
+
+
+	public float getDisplayWidth() {
+		return displayWidth;
+	}
+
 	/**The width of the devise display*/
 	private float displayWidth;
 	/**Texture region for smily face*/
