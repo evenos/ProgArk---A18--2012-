@@ -1,5 +1,8 @@
 package no.progark.a18.towerdefence.level;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.util.FPSLogger;
@@ -27,24 +30,23 @@ public class FirstLevel extends Scene {
 	
 	FirstLevel(TowerDefenceActivity tda){
 		this.TDA = tda;
-		setBackground(new Background(Color.BLUE));
+		setBackground(new Background(Color.GREEN));
 		displayHeight = tda.getDisplayHeight();
 		displayWidth = tda.getDisplayWidth();
-		loadResourses(tda);
 		createLevel();
+		loadResourses(tda);
+		
 		
 	}
 	
 	void createLevel(){
 		
-		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
+		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("sprites/");
 		
 		BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(
 				TDA.getTextureManager(), 32, 32,
 				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		
-		ITextureRegion faceTextureRegion = BitmapTextureAtlasTextureRegionFactory
-				.createFromAsset(bitmapTextureAtlas, TDA, "face_box.png", 0, 0);
 		
 		TDA.getEngine().getTextureManager().loadTexture(bitmapTextureAtlas);
 	}
@@ -68,31 +70,43 @@ public class FirstLevel extends Scene {
 				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		
 		ITextureRegion faceTextureRegion = BitmapTextureAtlasTextureRegionFactory
-				.createFromAsset(bitmapTextureAtlas, TDA, "face_box.png", 0, 0);
+				.createFromAsset(bitmapTextureAtlas, TDA, "brown.png", 0, 0);
 		
 		TDA.getEngine().getTextureManager().loadTexture(bitmapTextureAtlas);
 		
-		
-		/*
-		 * Calculate the coordinates for the face, so its centered on the
-		 * camera.
-		 */
-		final float centerX = (displayWidth - faceTextureRegion.getWidth()) / 2;
-		final float centerY = (displayHeight - faceTextureRegion.getHeight()) / 2;
+	
 
-		/* Create the face and add it to the scene. */
-		final Sprite face = new Sprite(centerX, centerY, faceTextureRegion,
-				tda.getVertexBufferObjectManager()) {
-			@Override
-			public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
-					float pTouchAreaLocalX, float pTouchAreaLocalY) {
-				this.setPosition(pSceneTouchEvent.getX() - this.getWidth() / 2,
-						pSceneTouchEvent.getY() - this.getHeight() / 2);
-				return true;
-			}
-		};
-		face.setScale(4f);
-		this.attachChild(face);
+		/* Create the road and add it to the scene. */
+		
+		List<Sprite> vei = new ArrayList<Sprite>();
+		List<Sprite> vei2 = new ArrayList<Sprite>();
+		int innrykk =48;
+		
+		//Legger til den ¿verste raden med veg
+		for(int i=0; i<7; i++){
+			vei.add(new Sprite(innrykk, 48, faceTextureRegion,	tda.getVertexBufferObjectManager()) );
+			innrykk+=faceTextureRegion.getWidth()*4;
+			vei.get(i).setScale(4f);
+			this.attachChild(vei.get(i));
+		}
+		
+		innrykk=48;
+		int temp=0;
+		//Legger til den nederste raden med veg
+		for(int i=0; i<7; i++){
+			vei2.add(new Sprite(innrykk, displayHeight-80, faceTextureRegion,	tda.getVertexBufferObjectManager()) );
+			innrykk+=faceTextureRegion.getWidth()*4;
+			vei2.get(i).setScale(4f);
+			this.attachChild(vei2.get(i));
+			if(i==4)
+				temp=innrykk;
+		}
+		
+		//Legger til vei pŒ h¿yre siden
+		Sprite sprite = new Sprite(temp, displayHeight - 250, faceTextureRegion, tda.getVertexBufferObjectManager());
+		sprite.setScale(4f);
+		this.attachChild(sprite);
+		
 		
 	}
 	
