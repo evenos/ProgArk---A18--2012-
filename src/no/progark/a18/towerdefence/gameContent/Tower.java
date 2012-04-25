@@ -1,7 +1,11 @@
 package no.progark.a18.towerdefence.gameContent;
 
-import no.progark.a18.towerdefence.logic.Content;
+import org.andengine.entity.sprite.Sprite;
+import org.andengine.entity.sprite.vbo.ISpriteVertexBufferObject;
+import org.andengine.opengl.texture.region.ITextureRegion;
 
-public class Tower extends Content {
-
+public class Tower extends Sprite {
+	public Tower() {
+		super(0f, 0f, (ITextureRegion) null, (ISpriteVertexBufferObject) null);
+	}
 }

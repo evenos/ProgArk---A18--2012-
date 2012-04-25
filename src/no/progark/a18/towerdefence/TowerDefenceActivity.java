@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import no.progark.a18.towerdefence.logic.MainMenu;
-import no.progark.a18.towerdefence.logic.State;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.options.EngineOptions;
@@ -49,7 +48,7 @@ public class TowerDefenceActivity extends SimpleBaseGameActivity {
 	/**Texture region for smily face*/
 	private ITextureRegion faceTextureRegion;
 	/**The stack of states that manages the states of the game*/
-	private List<State> states = new LinkedList<State>();
+	private List<Scene> states = new LinkedList<Scene>();
 	
 	//liten kommentar
 
@@ -84,7 +83,7 @@ public class TowerDefenceActivity extends SimpleBaseGameActivity {
 	protected Scene onCreateScene() {
 		getEngine().registerUpdateHandler(new FPSLogger());
 
-		final no.progark.a18.towerdefence.logic.Scene menu = new MainMenu(this);
+		final Scene menu = new MainMenu(this);
 
 		/*
 		 * Calculate the coordinates for the face, so its centered on the
@@ -113,15 +112,15 @@ public class TowerDefenceActivity extends SimpleBaseGameActivity {
 		return menu;
 	}
 	
-	public void pushState(State state){
+	public void pushState(Scene state){
 		if(states != null){
 			states.add(state);
 			getEngine().setScene(state);
 		}
 	}
 	
-	public State popState(){
-		State scene = states.isEmpty() ? null : states.remove(0);
+	public Scene popState(){
+		Scene scene = states.isEmpty() ? null : states.remove(0);
 		
 		if(states != null)
 			getEngine().setScene(scene);
@@ -129,7 +128,7 @@ public class TowerDefenceActivity extends SimpleBaseGameActivity {
 		return scene;
 	}
 	
-	public State peekState(){
+	public Scene peekState(){
 		return states.isEmpty() ? null : states.get(0);
 	}
 

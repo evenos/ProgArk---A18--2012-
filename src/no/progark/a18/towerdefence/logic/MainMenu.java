@@ -4,6 +4,7 @@ import no.progark.a18.towerdefence.R;
 import no.progark.a18.towerdefence.TowerDefenceActivity;
 import no.progark.a18.towerdefence.level.LevelFactory;
 
+import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;

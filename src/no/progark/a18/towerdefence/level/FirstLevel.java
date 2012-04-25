@@ -3,6 +3,7 @@ package no.progark.a18.towerdefence.level;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.util.FPSLogger;
@@ -17,7 +18,6 @@ import org.andengine.ui.activity.BaseGameActivity;
 import org.andengine.util.color.Color;
 
 import no.progark.a18.towerdefence.TowerDefenceActivity;
-import no.progark.a18.towerdefence.logic.Scene;
 
 /**
  * The first level for the TowerDefence game
@@ -51,7 +51,7 @@ public class FirstLevel extends Scene {
 		TDA.getEngine().getTextureManager().loadTexture(bitmapTextureAtlas);
 	}
 
-	@Override
+	
 	public void loadResourses(BaseGameActivity tda) {
 		this.fontTexture = new BitmapTextureAtlas(tda.getTextureManager(), 256,
 				256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -82,7 +82,7 @@ public class FirstLevel extends Scene {
 		List<Sprite> vei2 = new ArrayList<Sprite>();
 		int innrykk =48;
 		
-		//Legger til den ¿verste raden med veg
+		//Legger til den ï¿½verste raden med veg
 		for(int i=0; i<7; i++){
 			vei.add(new Sprite(innrykk, 48, faceTextureRegion,	tda.getVertexBufferObjectManager()) );
 			innrykk+=faceTextureRegion.getWidth()*4;
@@ -102,7 +102,7 @@ public class FirstLevel extends Scene {
 				temp=innrykk;
 		}
 		
-		//Legger til vei pŒ h¿yre siden
+		//Legger til vei pï¿½ hï¿½yre siden
 		Sprite sprite = new Sprite(temp, displayHeight - 250, faceTextureRegion, tda.getVertexBufferObjectManager());
 		sprite.setScale(4f);
 		this.attachChild(sprite);

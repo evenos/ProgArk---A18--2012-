@@ -1,9 +1,9 @@
 package no.progark.a18.towerdefence.level;
 
+import org.andengine.entity.scene.Scene;
 import org.andengine.ui.activity.BaseGameActivity;
 
 import no.progark.a18.towerdefence.TowerDefenceActivity;
-import no.progark.a18.towerdefence.logic.Scene;
 
 /**
  *Factory class for loading scenes
