@@ -20,25 +20,30 @@ import no.progark.a18.towerdefence.TowerDefenceActivity;
 import no.progark.a18.towerdefence.gameContent.Cell;
 import no.progark.a18.towerdefence.gameContent.Direction;
 import no.progark.a18.towerdefence.gameContent.Creep;
+import no.progark.a18.towerdefence.gameContent.KillListener;
+import no.progark.a18.towerdefence.gameContent.Tower;
 import no.progark.a18.towerdefence.gameContent.TowerdefenceSprite;
 
 /**
  * A static scene mainly for testing purposes.
  */
-class StaticLevel1 extends TowerDefenceScene {
+class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 	private final static String TAG = StaticLevel1.class.getName();
 	private final TowerDefenceActivity TDA;
 
 	private float scale = 1.25f;
 	
 	private int numRows, numColls;
-
+	
+	private Cell startCell;
 	private Cell[][] backgroundTiles;
+	private Tower[][] towers;
 
 	private Font exitFont;
 	private BitmapTextureAtlas fontTexture;
 
 	private ITextureRegion creepTextureregion;
+	private ITextureRegion towerTextureregion;
 	private ITextureRegion brownTextureRegion;
 	private ITextureRegion greenTextureRegion;
 
@@ -56,19 +61,25 @@ class StaticLevel1 extends TowerDefenceScene {
 		this.TDA = tda;
 		numColls = 16;
 		numRows = 11;
+		backgroundTiles = new Cell[numRows][numColls];
+		towers = new Tower[numRows][numColls];
 		
-		loadResourses(TDA);
+		loadResourses();
 
 		setBackground(new Background(Color.RED));
-
+		
 		addBackgCells();
 		addText();
+		addTower();
 		addCreeps();
 	}
 
-	private void addBackgCells() {
-		backgroundTiles = new Cell[numRows][numColls];
+	private void addTower() {
+		Tower tower = new Tower(numColls-2, 1, 32, 32, towerTextureregion, TDA.getVertexBufferObjectManager(), backgroundTiles);
+		addTower(numColls-2, 1, tower);
+	}
 
+	private void addBackgCells() {
 		// Add brown columns(midle) 
 		boolean dir = true;
 		for (int y = 0; y < numRows; y += 2) {
@@ -120,14 +131,18 @@ class StaticLevel1 extends TowerDefenceScene {
 				}
 			}
 		}
+		
+		startCell = backgroundTiles[0][backgroundTiles[0].length-1];
+		
 	}
 
 	private void addCreeps() {
 		creep = new Creep(scale* (numColls-1) * 32, 0f, 32f, 32f, creepTextureregion,
-				TDA.getVertexBufferObjectManager(), this);
+				TDA.getVertexBufferObjectManager(), this, this);
 		creep.setSpeed(-300f, 0f);
 		creep.setScale(scale - 0.1f);
 		creep.registerUpdateHandler(new PathFinder(backgroundTiles[0].length-1, 0, creep));
+		startCell.addCreep(creep);
 		attachChild(creep);
 		Log.d(TAG, "Added creep sprite");
 	}
@@ -150,19 +165,22 @@ class StaticLevel1 extends TowerDefenceScene {
 		this.attachChild(exitToMain);
 	}
 
-	public void loadResourses(final BaseGameActivity tda) {
+	public void loadResourses() {
 		// Load font texture
-		this.fontTexture = new BitmapTextureAtlas(tda.getTextureManager(), 256,
+		this.fontTexture = new BitmapTextureAtlas(TDA.getTextureManager(), 256,
 				256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 
-		this.exitFont = FontFactory.createFromAsset(tda.getFontManager(),
-				this.fontTexture, tda.getAssets(), "Sabatica-regular.ttf", 48,
+		this.exitFont = FontFactory.createFromAsset(TDA.getFontManager(),
+				this.fontTexture, TDA.getAssets(), "Sabatica-regular.ttf", 48,
 				true, Color.BLACK.getABGRPackedInt());
-		tda.getEngine().getTextureManager().loadTexture(this.fontTexture);
-		tda.getFontManager().loadFont(this.exitFont);
+		TDA.getEngine().getTextureManager().loadTexture(this.fontTexture);
+		TDA.getFontManager().loadFont(this.exitFont);
 
 		// load creep texture
 		creepTextureregion = loadTexture("gfx/", "creep1.png", 32, 32);
+		
+		// load creep texture
+		towerTextureregion = loadTexture("gfx/", "tower1.png", 32, 32);
 
 		// load brown background images
 		brownTextureRegion = loadTexture("sprites/", "brown.png", 32, 32);
@@ -192,7 +210,25 @@ class StaticLevel1 extends TowerDefenceScene {
 
 	public void reatchedtTargt(TowerdefenceSprite sprite) {
 		System.out.println("Weeeehoooooo");
+		//TODO:
+	}
+	
+	public boolean addTower(int x, int y, Tower tower){
+		if(backgroundTiles[y][x].isRoad() || towers[y][x] != null)
+			return false;
+		
+		towers[y][x] = tower;
+		tower.setX(x*scale*32);
+		tower.setY(y*scale*32);
+		attachChild(tower);
+		return true;
+	}
+	
+	public boolean removeTower(int x, int y){
+		Tower tower = towers[y][x];
+		boolean datatched = detachChild(tower);
 
+		return datatched;
 	}
 	
 	private class PathFinder implements IUpdateHandler{
@@ -210,33 +246,33 @@ class StaticLevel1 extends TowerDefenceScene {
 			case left :
 				float boundryLeft = (posX-1) * scale * 32;
 				if(creep.getX() < boundryLeft){
-					posX--;
+					backgroundTiles[posY][posX--].removeCreep(creep);
+					backgroundTiles[posY][posX].addCreep(creep);
 					changeDir(backgroundTiles[posY][posX].getDirToNextRoad());
-					Log.d(TAG, "Past boundery, new posX:"+posX);
 				}
 				break;
 			case down :
 				float boundryDown = (posY+1) * scale * 32;
 				if(creep.getY() > boundryDown){
-					posY++;
+					backgroundTiles[posY++][posX].removeCreep(creep);
+					backgroundTiles[posY][posX].addCreep(creep);
 					changeDir(backgroundTiles[posY][posX].getDirToNextRoad());
-					Log.d(TAG, "Past boundery, new posY:"+posY);
 				}
 				break;
 			case right :
 				float boundryRight = (posX+1) * scale * 32;
 				if(creep.getX() > boundryRight){
-					posX++;
+					backgroundTiles[posY][posX++].removeCreep(creep);
+					backgroundTiles[posY][posX].addCreep(creep);
 					changeDir(backgroundTiles[posY][posX].getDirToNextRoad());
-					Log.d(TAG, "Past boundery, new posX:"+posX);
 				}
 				break;
 			case up :
 				float boundryUp = (posY-1) * scale * 32 - 16;
 				if(creep.getY() > boundryUp){
-					posY--;
+					backgroundTiles[posY--][posX].removeCreep(creep);
+					backgroundTiles[posY][posX].addCreep(creep);
 					changeDir(backgroundTiles[posY][posX].getDirToNextRoad());
-					Log.d(TAG, "Past boundery, new posY:"+posY);
 				}
 				break;
 			default:
@@ -245,7 +281,6 @@ class StaticLevel1 extends TowerDefenceScene {
 
 		private void changeDir(Direction dirToNextRoad) {
 			float speed = Math.max(Math.abs(creep.getSpeedX()), Math.abs(creep.getSpeedY()));
-			Log.d(TAG, "Switching dir to:"+dirToNextRoad);
 			switch(dirToNextRoad){
 			case left :
 				creep.setSpeed(-speed, 0);
@@ -264,5 +299,20 @@ class StaticLevel1 extends TowerDefenceScene {
 		}
 
 		public void reset() { }
+	}
+
+	public void wasKilled(final Creep creep) {
+		for(Cell[] row : backgroundTiles)
+			for(Cell cell : row)
+				if(cell.containsCreep(creep))
+					cell.removeCreep(creep);
+		
+		TDA.runOnUpdateThread(new Runnable() {
+			public void run() {
+				detachChild(creep);
+			}
+		});
+		
+		Log.d(TAG, "Creep detaqtched");
 	}
 }
