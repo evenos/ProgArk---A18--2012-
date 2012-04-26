@@ -6,8 +6,6 @@ import java.util.List;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.entity.util.FPSLogger;
-import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.texture.TextureOptions;
@@ -26,6 +24,7 @@ public class FirstLevel extends Scene {
 	private final TowerDefenceActivity TDA;
 	private Font exitFont;
 	private BitmapTextureAtlas fontTexture;
+	@SuppressWarnings("unused")
 	private float displayHeight, displayWidth;
 	
 	FirstLevel(TowerDefenceActivity tda){

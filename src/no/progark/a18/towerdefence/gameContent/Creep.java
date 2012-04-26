@@ -5,10 +5,8 @@ import no.progark.a18.towerdefence.level.ReatchedTargetListener;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
-import android.util.Log;
 
 public class Creep extends TowerdefenceSprite{
-	private static final String TAG = Creep.class.getName();
 	private int hp = 20;
 	private KillListener killlistener;
 

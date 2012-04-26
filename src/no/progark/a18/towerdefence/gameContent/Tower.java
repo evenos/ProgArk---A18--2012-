@@ -5,10 +5,7 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
-import android.util.Log;
-
 public class Tower extends Sprite {
-	private static final String TAG = Tower.class.getName();
 	private int x, y;
 	private int damage;
 	private int range;
@@ -27,6 +24,22 @@ public class Tower extends Sprite {
 		range = 1;
 
 		registerUpdateHandler(new AtackHandeler(1f));
+	}
+
+	public int getPosX() {
+		return x;
+	}
+	
+	public void setPosX(int x){
+		this.x = x;
+	}
+
+	public int getPosY() {
+		return y;
+	}
+	
+	public void setPosY(int y){
+		this.y = y;
 	}
 
 	private class AtackHandeler implements IUpdateHandler {
