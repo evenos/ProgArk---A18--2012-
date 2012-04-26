@@ -82,7 +82,8 @@ public class FirstLevel extends Scene {
 		List<Sprite> vei2 = new ArrayList<Sprite>();
 		int innrykk =48;
 		
-		//Legger til den �verste raden med veg
+		//Legger til den �verste raden med vei
+
 		for(int i=0; i<7; i++){
 			vei.add(new Sprite(innrykk, 48, faceTextureRegion,	tda.getVertexBufferObjectManager()) );
 			innrykk+=faceTextureRegion.getWidth()*4;
@@ -92,7 +93,7 @@ public class FirstLevel extends Scene {
 		
 		innrykk=48;
 		int temp=0;
-		//Legger til den nederste raden med veg
+		//Legger til den nederste raden med vei
 		for(int i=0; i<7; i++){
 			vei2.add(new Sprite(innrykk, displayHeight-80, faceTextureRegion,	tda.getVertexBufferObjectManager()) );
 			innrykk+=faceTextureRegion.getWidth()*4;
@@ -103,10 +104,27 @@ public class FirstLevel extends Scene {
 		}
 		
 		//Legger til vei p� h�yre siden
-		Sprite sprite = new Sprite(temp, displayHeight - 250, faceTextureRegion, tda.getVertexBufferObjectManager());
-		sprite.setScale(4f);
-		this.attachChild(sprite);
+		List<Sprite> vei3 = new ArrayList<Sprite>();
 		
+		float temp2=faceTextureRegion.getWidth()*4;
+		
+		vei3.add(new Sprite(temp, displayHeight -(80+temp2), faceTextureRegion, tda.getVertexBufferObjectManager()));
+		vei3.get(0).setScale(4f);
+		this.attachChild(vei3.get(0));
+		
+		vei3.add(new Sprite(temp+(faceTextureRegion.getWidth()*4), displayHeight -(80+temp2), faceTextureRegion, tda.getVertexBufferObjectManager()));
+		vei3.get(1).setScale(4f);
+		this.attachChild(vei3.get(1));
+		
+		temp2=temp2*2;
+		vei3.add(new Sprite(temp, displayHeight -(80+temp2), faceTextureRegion, tda.getVertexBufferObjectManager()));
+		vei3.get(2).setScale(4f);
+		this.attachChild(vei3.get(2));
+		
+		
+		vei3.add(new Sprite(temp+(faceTextureRegion.getWidth()*4), displayHeight -(80+temp2), faceTextureRegion, tda.getVertexBufferObjectManager()));
+		vei3.get(3).setScale(4f);
+		this.attachChild(vei3.get(3));		
 		
 	}
 	

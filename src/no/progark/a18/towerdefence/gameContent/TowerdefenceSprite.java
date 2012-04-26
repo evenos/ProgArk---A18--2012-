@@ -32,9 +32,8 @@ public abstract class TowerdefenceSprite extends Sprite{
 				long delta = System.currentTimeMillis() - lastUpdate;
 				lastUpdate = System.currentTimeMillis();
 				
-				setX(getX() + (getSpeedX()/(1000- delta)));
-				setY(getY() + (getSpeedY()/(1000- delta)));
-				
+				setX(getX() + (getSpeedX()/(1000- delta)*3));
+				setY(getY() + (getSpeedY()/(1000- delta)*3));
 			}
 
 			public void reset() {
