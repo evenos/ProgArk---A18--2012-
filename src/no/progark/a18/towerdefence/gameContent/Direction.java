@@ -1,5 +1,8 @@
 package no.progark.a18.towerdefence.gameContent;
 
-public enum Direction{
-	up, down, left, right;
+public enum Direction {
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT;
 }

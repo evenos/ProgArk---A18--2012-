@@ -7,46 +7,42 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
-public abstract class TowerdefenceSprite extends Sprite{
-	protected ReatchedTargetListener reatchedTargetListner;
+public abstract class TowerDefenceSprite extends Sprite {
 	
-	private float speedX, speedY;
+	protected ReatchedTargetListener reachedTargetListener;
+	private float speedX;
+	private float speedY;
 	
-	
-	
-	
-	
-	public TowerdefenceSprite(float pX, float pY, float pWidth, float pHeight,
-			ITextureRegion pTextureRegion,
-			VertexBufferObjectManager pVertexBufferObjectManager, ReatchedTargetListener reatchedTargetListner) {
-		super(pX, pY, pWidth, pHeight, pTextureRegion, pVertexBufferObjectManager);
+	public TowerDefenceSprite(	float posX, float posY,
+								float pWidth, float pHeight,
+								ITextureRegion pTextureRegion,
+								VertexBufferObjectManager pVertexBufferObjectManager,
+								ReatchedTargetListener reachedTargetListener) {
 		
-		this.reatchedTargetListner = reatchedTargetListner;
+		super(posX, posY, pWidth, pHeight, pTextureRegion, pVertexBufferObjectManager);
+		this.reachedTargetListener = reachedTargetListener;
 		
-		registerUpdateHandler(new IUpdateHandler(){
-			
-			
-			long lastUpdate = System.currentTimeMillis();
-
-			public void onUpdate(float pSecondsElapsed) {
-				long delta = System.currentTimeMillis() - lastUpdate;
-				lastUpdate = System.currentTimeMillis();
-				
-				setX(getX() + (getSpeedX()/(1000- delta)*3));
-				setY(getY() + (getSpeedY()/(1000- delta)*3));
-			}
-
-			public void reset() {
-				// TODO Auto-generated method stub
-				
-			}
-			
-		});
+		registerUpdateHandler(new TowerDefenceSpriteUpdateHandler());
 	}
+	
+	public class TowerDefenceSpriteUpdateHandler implements IUpdateHandler {
+		
+		private long lastUpdate;
+		
+		public TowerDefenceSpriteUpdateHandler() {
+			lastUpdate = System.currentTimeMillis();
+		}
 
+		public void onUpdate(float pSecondsElapsed) {
+			long delta = System.currentTimeMillis() - lastUpdate;
+			lastUpdate = System.currentTimeMillis();
+			
+			setX(getX() + (getSpeedX()/(1000- delta)*3));
+			setY(getY() + (getSpeedY()/(1000- delta)*3));
+		}
 
-
-
+		public void reset() { }
+	}
 
 	public float getSpeedX() {
 		return speedX;
@@ -60,5 +56,4 @@ public abstract class TowerdefenceSprite extends Sprite{
 		this.speedX = speedX;
 		this.speedY = speedY;
 	}
-
 }

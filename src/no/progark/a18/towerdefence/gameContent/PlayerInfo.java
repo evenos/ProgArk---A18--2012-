@@ -4,7 +4,8 @@ package no.progark.a18.towerdefence.gameContent;
  */
 public class PlayerInfo {
 	
-	private int life, money;
+	private int life;
+	private int money;
 
 	/**
 	 * @return the life

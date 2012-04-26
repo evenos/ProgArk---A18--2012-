@@ -6,74 +6,81 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 public class Tower extends Sprite {
-	private int x, y;
+	private int gridPosX;
+	private int gridPosY;
 	private int damage;
 	private int range;
 	private Cell[][] board;
 
-	public Tower(int x, int y, float pWidth, float pHeight,
-			ITextureRegion pTextureRegion,
-			VertexBufferObjectManager pVertexBufferObjectManager,
-			Cell[][] creepBoard) {
-		super(0f, 0f, pWidth, pHeight, pTextureRegion,
-				pVertexBufferObjectManager);
-		this.x = x;
-		this.y = y;
+	public Tower(	int gridPosX, int gridPosY,
+					float pWidth, float pHeight,
+					ITextureRegion pTextureRegion,
+					VertexBufferObjectManager pVertexBufferObjectManager,
+					Cell[][] creepBoard) {
+		
+		super(0f, 0f, pWidth, pHeight, pTextureRegion, pVertexBufferObjectManager);
+		this.gridPosX = gridPosX;
+		this.gridPosY = gridPosY;
 		this.board = creepBoard;
 		damage = 5;
 		range = 1;
 
-		registerUpdateHandler(new AtackHandeler(1f));
+		registerUpdateHandler(new AttackHandler(1f));
 	}
 
-	public int getPosX() {
-		return x;
+
+	public int getgridPosX() {
+		return gridPosY;
 	}
 	
-	public void setPosX(int x){
-		this.x = x;
+	public void setGridPosX(int gridPosX){
+		this.gridPosX = gridPosX;
 	}
 
-	public int getPosY() {
-		return y;
+	public int getGridPosY() {
+		return gridPosY;
 	}
 	
-	public void setPosY(int y){
-		this.y = y;
+	public void setGridPosY(int gridPosY){
+		this.gridPosY = gridPosY;
 	}
 
-	private class AtackHandeler implements IUpdateHandler {
+
+	private class AttackHandler implements IUpdateHandler {
+		
 		private float speed;
-		private float pauseSoFare;
+		private float pauseSoFar;
 
-		public AtackHandeler(float speed) {
+		public AttackHandler(float speed) {
 			this.speed = speed;
-			this.pauseSoFare = speed;
+			this.pauseSoFar = speed;
 		}
 
 		public void onUpdate(float pSecondsElapsed) {
-			if (pauseSoFare + pSecondsElapsed < speed) {
-				pauseSoFare += pSecondsElapsed;
+			if (pauseSoFar + pSecondsElapsed < speed) {
+				pauseSoFar += pSecondsElapsed;
 				return;
 			}
-			for (int row = y - range; row <= y + range; row++) {
-				if (row < 0 || row >= board.length)
+			for (int row = gridPosY - range; row <= gridPosY + range; row++) {
+				if (row < 0 || row >= board.length) {
 					continue;
-				for (int coll = x - range; coll <= x + range; coll++) {
-					if (coll < 0 || coll >= board[row].length)
+				}
+				
+				for (int coll = gridPosX - range; coll <= gridPosX + range; coll++) {
+					if (coll < 0 || coll >= board[row].length) {
 						continue;
-					Creep creep = board[row][coll].peakCreep();
-					if (creep == null)
+					}
+					
+					Creep creep = board[row][coll].peekCreep();
+					if (creep == null) {
 						continue;
+					}
 					creep.setHp(creep.getHp() - damage);
-					pauseSoFare = 0;
+					pauseSoFar = 0;
 				}
 			}
 		}
 
-		public void reset() {
-			// TODO Auto-generated method stub
-
-		}
+		public void reset() { }
 	}
 }
