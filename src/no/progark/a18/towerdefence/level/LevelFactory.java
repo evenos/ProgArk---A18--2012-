@@ -31,7 +31,8 @@ public class LevelFactory {
 		if ("1".equals(id))
 			return new StaticLevel1(TDA);
 		if ("2".equals(id))
-		return new FirstLevel(TDA);
+			return new Level(TDA, id);
+//		return new FirstLevel(TDA);
 		// TODO: Load from local fileSystem
 
 		return null;
