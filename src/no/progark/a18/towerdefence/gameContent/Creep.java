@@ -5,20 +5,21 @@ import no.progark.a18.towerdefence.level.ReatchedTargetListener;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
-import android.util.Log;
-
-public class Creep extends TowerdefenceSprite{
-	private static final String TAG = Creep.class.getName();
+public class Creep extends TowerDefenceSprite {
+	
+	private static final String tag = Creep.class.getName();
 	private int hp = 20;
-	private KillListener killlistener;
+	private KillListener killListener;
 
-	public Creep(float pX, float pY, float pWidth, float pHeight,
-			ITextureRegion pTextureRegion,
-			VertexBufferObjectManager pVertexBufferObjectManager,
-			ReatchedTargetListener reatchedTargetListner, KillListener killListener) {
-		super(pX, pY, pWidth, pHeight, pTextureRegion, pVertexBufferObjectManager,
-				reatchedTargetListner);
-		this.killlistener = killListener;
+	public Creep(	float posX, float posY,
+					float pWidth, float pHeight,
+					ITextureRegion pTextureRegion,
+					VertexBufferObjectManager pVertexBufferObjectManager,
+					ReatchedTargetListener reatchedTargetListner,
+					KillListener killListener) {
+		
+		super(posX, posY, pWidth, pHeight, pTextureRegion, pVertexBufferObjectManager, reatchedTargetListner);
+		this.killListener = killListener;
 	}
 
 	public int getHp() {
@@ -27,7 +28,7 @@ public class Creep extends TowerdefenceSprite{
 
 	public void setHp(int hp) {
 		if(hp <= 0)
-			this.killlistener.wasKilled(this);
+			killListener.wasKilled(this);
 		this.hp = hp;
 	}
 

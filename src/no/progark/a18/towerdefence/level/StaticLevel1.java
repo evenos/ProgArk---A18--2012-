@@ -22,7 +22,7 @@ import no.progark.a18.towerdefence.gameContent.Direction;
 import no.progark.a18.towerdefence.gameContent.Creep;
 import no.progark.a18.towerdefence.gameContent.KillListener;
 import no.progark.a18.towerdefence.gameContent.Tower;
-import no.progark.a18.towerdefence.gameContent.TowerdefenceSprite;
+import no.progark.a18.towerdefence.gameContent.TowerDefenceSprite;
 
 /**
  * A static scene mainly for testing purposes.
@@ -80,13 +80,13 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 	}
 
 	private void addBackgCells() {
-		// Add brown columns(midle) 
+		// Add brown columns(midle)
 		boolean dir = true;
 		for (int y = 0; y < numRows; y += 2) {
 			for(int x = 1; x < numColls -1; x++){
 				backgroundTiles[y][x] = new Cell(scale*x*32, scale*y*32, 32, 32, brownTextureRegion, TDA.getVertexBufferObjectManager(), true);
 				backgroundTiles[y][x].setScale(scale);
-				backgroundTiles[y][x].setDirToNextRoad(dir?Direction.left : Direction.right);
+				backgroundTiles[y][x].setDirectionToNextRoad(dir?Direction.LEFT : Direction.RIGHT);
 			
 				attachChild(backgroundTiles[y][x]);
 			}
@@ -98,10 +98,10 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 			int x = backgroundTiles[y].length-1;
 			backgroundTiles[y][0] = new Cell(scale*0*32, scale*y*32, 32, 32, brownTextureRegion, TDA.getVertexBufferObjectManager(), true);
 			backgroundTiles[y][0].setScale(scale);
-			backgroundTiles[y][0].setDirToNextRoad(dir? Direction.down : Direction.right);
+			backgroundTiles[y][0].setDirectionToNextRoad(dir? Direction.DOWN : Direction.RIGHT);
 			backgroundTiles[y][x] = new Cell(scale*x*32, scale*y*32, 32, 32, brownTextureRegion, TDA.getVertexBufferObjectManager(), true);
 			backgroundTiles[y][x].setScale(scale);
-			backgroundTiles[y][x].setDirToNextRoad(dir? Direction.left : Direction.down);
+			backgroundTiles[y][x].setDirectionToNextRoad(dir? Direction.LEFT : Direction.DOWN);
 			
 			attachChild(backgroundTiles[y][0]);
 			attachChild(backgroundTiles[y][x]);
@@ -113,7 +113,7 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 			int x = dir ? 0 : backgroundTiles[y].length-1;
 			backgroundTiles[y][x] = new Cell(scale*x*32, scale*y*32, 32, 32, brownTextureRegion, TDA.getVertexBufferObjectManager(), true);
 			backgroundTiles[y][x].setScale(scale);
-			backgroundTiles[y][x].setDirToNextRoad(Direction.down);
+			backgroundTiles[y][x].setDirectionToNextRoad(Direction.DOWN);
 			
 			attachChild(backgroundTiles[y][x]);
 			dir = !dir;
@@ -208,7 +208,7 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		return textureRegion;
 	}
 
-	public void reatchedtTargt(TowerdefenceSprite sprite) {
+	public void reatchedtTargt(TowerDefenceSprite sprite) {
 		System.out.println("Weeeehoooooo");
 		//TODO:
 	}
@@ -242,37 +242,37 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		}
 
 		public void onUpdate(float pSecondsElapsed) {
-			switch(backgroundTiles[posY][posX].getDirToNextRoad()){
-			case left :
+			switch(backgroundTiles[posY][posX].getDirectionToNextRoad()){
+			case LEFT :
 				float boundryLeft = (posX-1) * scale * 32;
 				if(creep.getX() < boundryLeft){
 					backgroundTiles[posY][posX--].removeCreep(creep);
 					backgroundTiles[posY][posX].addCreep(creep);
-					changeDir(backgroundTiles[posY][posX].getDirToNextRoad());
+					changeDir(backgroundTiles[posY][posX].getDirectionToNextRoad());
 				}
 				break;
-			case down :
+			case DOWN :
 				float boundryDown = (posY+1) * scale * 32;
 				if(creep.getY() > boundryDown){
 					backgroundTiles[posY++][posX].removeCreep(creep);
 					backgroundTiles[posY][posX].addCreep(creep);
-					changeDir(backgroundTiles[posY][posX].getDirToNextRoad());
+					changeDir(backgroundTiles[posY][posX].getDirectionToNextRoad());
 				}
 				break;
-			case right :
+			case RIGHT :
 				float boundryRight = (posX+1) * scale * 32;
 				if(creep.getX() > boundryRight){
 					backgroundTiles[posY][posX++].removeCreep(creep);
 					backgroundTiles[posY][posX].addCreep(creep);
-					changeDir(backgroundTiles[posY][posX].getDirToNextRoad());
+					changeDir(backgroundTiles[posY][posX].getDirectionToNextRoad());
 				}
 				break;
-			case up :
+			case UP :
 				float boundryUp = (posY-1) * scale * 32 - 16;
 				if(creep.getY() > boundryUp){
 					backgroundTiles[posY--][posX].removeCreep(creep);
 					backgroundTiles[posY][posX].addCreep(creep);
-					changeDir(backgroundTiles[posY][posX].getDirToNextRoad());
+					changeDir(backgroundTiles[posY][posX].getDirectionToNextRoad());
 				}
 				break;
 			default:
@@ -282,16 +282,16 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		private void changeDir(Direction dirToNextRoad) {
 			float speed = Math.max(Math.abs(creep.getSpeedX()), Math.abs(creep.getSpeedY()));
 			switch(dirToNextRoad){
-			case left :
+			case LEFT :
 				creep.setSpeed(-speed, 0);
 				break;
-			case down :
+			case DOWN :
 				creep.setSpeed(0, speed);
 				break;
-			case right :
+			case RIGHT :
 				creep.setSpeed(speed, 0);
 				break;
-			case up :
+			case UP :
 				creep.setSpeed(0, -speed);
 				break;
 			default:
