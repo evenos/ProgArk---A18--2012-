@@ -1,9 +1,18 @@
 package no.progark.a18.towerdefence.gameContent;
 
+import no.progark.a18.towerdefence.TowerDefenceActivity;
+
 import org.andengine.engine.handler.IUpdateHandler;
+import org.andengine.engine.handler.timer.ITimerCallback;
+import org.andengine.engine.handler.timer.TimerHandler;
+import org.andengine.entity.primitive.Line;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.opengl.vbo.DrawType;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
+import org.andengine.util.color.Color;
+
+import android.util.Log;
 
 public class Tower extends Sprite {
 	private int gridPosX;
@@ -11,14 +20,16 @@ public class Tower extends Sprite {
 	private int damage;
 	private int range;
 	private Cell[][] board;
+	private final TowerDefenceActivity TDA;
 
 	public Tower(	int gridPosX, int gridPosY,
 					float pWidth, float pHeight,
 					ITextureRegion pTextureRegion,
 					VertexBufferObjectManager pVertexBufferObjectManager,
-					Cell[][] creepBoard) {
+					Cell[][] creepBoard, TowerDefenceActivity tda) {
 		
 		super(0f, 0f, pWidth, pHeight, pTextureRegion, pVertexBufferObjectManager);
+		this.TDA = tda;
 		this.gridPosX = gridPosX;
 		this.gridPosY = gridPosY;
 		this.board = creepBoard;
@@ -75,10 +86,38 @@ public class Tower extends Sprite {
 					if (creep == null) {
 						continue;
 					}
+					shoot(creep);
 					creep.setHp(creep.getHp() - damage);
 					pauseSoFar = 0;
 				}
 			}
+		}
+		public void shoot(final Creep other){
+
+					final Line line = new Line(getX(), getY(), other.getX(), other.getY(), 10, TDA.getVertexBufferObjectManager());
+					line.setColor(Color.PINK);
+					line.setVisible(true);
+					line.registerUpdateHandler(new IUpdateHandler(){
+						long timeStarted = System.currentTimeMillis();
+
+						public void onUpdate(float pSecondsElapsed) {
+							if(System.currentTimeMillis() - timeStarted > 400)
+								TDA.runOnUpdateThread(new Runnable() {
+									
+									public void run() {
+										TDA.peekState().detachChild(line);
+										
+									}
+								});
+						}
+
+						public void reset() {	}
+						
+					});
+					
+					TDA.peekState().attachChild(line);
+					
+
 		}
 
 		public void reset() { }

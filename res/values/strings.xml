@@ -7,5 +7,6 @@
     <string name="playLevelOne">Play level 1</string>
     <string name="returnToMain">Exit</string>
     <string name="PlayLevelTwo">Spell</string>
+    <string name="score">Score: </string>
 
 </resources>

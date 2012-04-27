@@ -9,6 +9,15 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 public class Creep extends TowerDefenceSprite {
 	
 	private int hp = 20;
+	private int scooreValue = 100;
+	public int getScooreValue() {
+		return scooreValue;
+	}
+
+	public void setScooreValue(int scooreValue) {
+		this.scooreValue = scooreValue;
+	}
+
 	private KillListener killListener;
 
 	public Creep(	float posX, float posY,
