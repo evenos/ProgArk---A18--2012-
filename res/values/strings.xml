@@ -11,5 +11,7 @@
     <string-array name="levels">
         <item >level1.lvl</item>
     </string-array>
+    <string name="gameName">Tower\nDefence</string>
+    <string name="chooseLevel">Choose level:</string>
 
 </resources>

@@ -1,6 +1,5 @@
 package no.progark.a18.towerdefence.gameContent;
 
-import no.progark.a18.towerdefence.level.ReatchedTargetListener;
 
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.sprite.Sprite;
@@ -9,18 +8,15 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 public abstract class TowerDefenceSprite extends Sprite {
 	
-	protected ReatchedTargetListener reachedTargetListener;
 	private float speedX;
 	private float speedY;
 	
 	public TowerDefenceSprite(	float posX, float posY,
 								float pWidth, float pHeight,
 								ITextureRegion pTextureRegion,
-								VertexBufferObjectManager pVertexBufferObjectManager,
-								ReatchedTargetListener reachedTargetListener) {
+								VertexBufferObjectManager pVertexBufferObjectManager) {
 		
 		super(posX, posY, pWidth, pHeight, pTextureRegion, pVertexBufferObjectManager);
-		this.reachedTargetListener = reachedTargetListener;
 		
 		registerUpdateHandler(new TowerDefenceSpriteUpdateHandler());
 	}

@@ -1,9 +1,19 @@
 package no.progark.a18.towerdefence.level;
 
+import java.util.List;
+
 import no.progark.a18.towerdefence.R;
 import no.progark.a18.towerdefence.TowerDefenceActivity;
+import no.progark.a18.towerdefence.gameContent.Cell;
+import no.progark.a18.towerdefence.gameContent.Creep;
+import no.progark.a18.towerdefence.gameContent.CreepEnteredCellListener;
+import no.progark.a18.towerdefence.gameContent.CreepKilledListener;
+import no.progark.a18.towerdefence.gameContent.Direction;
 import no.progark.a18.towerdefence.gameContent.PlayerInfo;
+import no.progark.a18.towerdefence.gameContent.Wave;
+import no.progark.a18.towerdefence.gameContent.WaveFinishedListener;
 
+import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
@@ -13,9 +23,7 @@ import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.util.color.Color;
 
-import android.util.Log;
-
-public abstract class TowerDefenceScene extends Scene implements ReatchedTargetListener{
+public abstract class TowerDefenceScene extends Scene implements WaveFinishedListener, CreepKilledListener, CreepEnteredCellListener{
 	protected final TowerDefenceActivity towerDefenceActivity;
 
 	protected final static float bardRegionWidth = 0.8f;
@@ -35,6 +43,14 @@ public abstract class TowerDefenceScene extends Scene implements ReatchedTargetL
 	
 	private Font font;
 	protected Text exitToMain, money, life, score;
+	
+	protected Cell startCell;
+	protected Cell goalCell;
+	protected Cell[][] backgroundTiles;
+	
+	
+	protected int currentWave = 0;
+	protected List<Wave> waves;
 
 	
 	
@@ -61,6 +77,16 @@ public abstract class TowerDefenceScene extends Scene implements ReatchedTargetL
 		
 	}
 
+	public void sendCreep(Creep creep){
+		creep.registerUpdateHandler(new PathFinder(startCell.getGridPosX(), startCell.getGridPosY(), creep));
+		creep.setScale(boardScale - 0.1f);
+		creep.setPosition(startCell);
+		startCell.addCreep(creep);
+		attachChild(creep);
+	}
+	
+	protected abstract void loadResourses();
+
 	protected void loadFonts() {
 		BitmapTextureAtlas fontTexture = new BitmapTextureAtlas(towerDefenceActivity.getTextureManager(), 256,
 				256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -73,8 +99,6 @@ public abstract class TowerDefenceScene extends Scene implements ReatchedTargetL
 		
 	}
 
-	protected abstract void loadResourses();
-	
 	/**
 	 * Updates the textfield for life amount
 	 */
@@ -120,5 +144,127 @@ public abstract class TowerDefenceScene extends Scene implements ReatchedTargetL
 		//Adding the life text
 		score = new Text(0, 50, this.font, "Score:"+Integer.MIN_VALUE, towerDefenceActivity.getVertexBufferObjectManager());
 	}
+	
+	protected void finished(){
+		towerDefenceActivity.popState();
+	}
+	
+	protected class PathFinder implements IUpdateHandler{
+		private Creep creep;
+		private int posX, posY;
+		
+		public PathFinder(int posX, int posY, Creep creep){
+			this.creep = creep;
+			this.posX = posX;
+			this.posY = posY;
+		}
+	
+		public void onUpdate(float pSecondsElapsed) {
+			switch(backgroundTiles[posY][posX].getDirectionToNextRoad()){
+			case LEFT :
+				float boundryLeft = (posX-1) * boardScale * 32;
+				if(creep.getX() < boundryLeft){
+					backgroundTiles[posY][posX--].removeCreep(creep);
+					backgroundTiles[posY][posX].addCreep(creep);
+					changeDir(backgroundTiles[posY][posX].getDirectionToNextRoad());
+				}
+				break;
+			case DOWN :
+				float boundryDown = (posY+1) * boardScale * 32;
+				if(creep.getY() > boundryDown){
+					backgroundTiles[posY++][posX].removeCreep(creep);
+					backgroundTiles[posY][posX].addCreep(creep);
+					changeDir(backgroundTiles[posY][posX].getDirectionToNextRoad());
+				}
+				break;
+			case RIGHT :
+				float boundryRight = (posX+1) * boardScale * 32;
+				if(creep.getX() > boundryRight){
+					backgroundTiles[posY][posX++].removeCreep(creep);
+					backgroundTiles[posY][posX].addCreep(creep);
+					changeDir(backgroundTiles[posY][posX].getDirectionToNextRoad());
+				}
+				break;
+			case UP :
+				float boundryUp = (posY-1) * boardScale * 32 - 16;
+				if(creep.getY() > boundryUp){
+					backgroundTiles[posY--][posX].removeCreep(creep);
+					backgroundTiles[posY][posX].addCreep(creep);
+					changeDir(backgroundTiles[posY][posX].getDirectionToNextRoad());
+				}
+				break;
+			default:
+			}			
+		}
+	
+		private void changeDir(Direction dirToNextRoad) {
+			float speed = Math.max(Math.abs(creep.getSpeedX()), Math.abs(creep.getSpeedY()));
+			switch(dirToNextRoad){
+			case LEFT :
+				creep.setSpeed(-speed, 0);
+				break;
+			case DOWN :
+				creep.setSpeed(0, speed);
+				break;
+			case RIGHT :
+				creep.setSpeed(speed, 0);
+				break;
+			case UP :
+				creep.setSpeed(0, -speed);
+				break;
+			default:
+			}
+		}
+	
+		public void reset() { }
+	}
+	public void removeCreep(final Creep creep) {
+		for(Cell[] row : backgroundTiles)
+			for(Cell cell : row)
+				if(cell.containsCreep(creep))
+					cell.removeCreep(creep);
+		
+		towerDefenceActivity.runOnUpdateThread(new Runnable() {
+			public void run() {
+				detachChild(creep);
+			}
+		});
+		
+	}
 
+	public void creepKilled(Creep creep) {
+		removeCreep(creep);
+		playerInfo.addGold(creep.getGoldValue());
+		playerInfo.addScore(creep.getScooreValue());
+	}
+	
+
+	public void waweFinished(Wave wave) {
+		currentWave++;
+		if(currentWave >= waves.size())
+			finished();
+		else{
+			//TODO: add time delay
+			attachChild(waves.get(currentWave));
+		}
+				
+	}
+
+	public void creepEnteredCell(Creep creep, Cell cell) {
+		if(goalCell.equals(cell)){
+			handleCreepOnGoal(creep);
+		}
+	}
+	
+	protected void handleCreepOnGoal(Creep creep) {
+		removeCreep(creep);
+		playerInfo.subtractLife(1);
+		if(playerInfo.getLife() <= 0){
+			loose();
+		}
+	}
+	
+	public abstract void winn();
+	
+	public abstract void loose();
 }

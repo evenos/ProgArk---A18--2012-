@@ -27,6 +27,7 @@ public class FirstLevel extends Scene {
 	private BitmapTextureAtlas fontTexture;
 
 	private float displayHeight;
+	@SuppressWarnings("unused")
 	private float displayWidth;
 	
 	public FirstLevel(TowerDefenceActivity tda) {

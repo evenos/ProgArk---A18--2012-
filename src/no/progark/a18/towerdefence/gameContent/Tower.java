@@ -88,7 +88,7 @@ public class Tower extends Sprite {
 			}
 		}
 		public void shoot(final Creep other){
-
+			
 					final Line line = new Line(getX(), getY(), other.getX(), other.getY(), 10, TDA.getVertexBufferObjectManager());
 					line.setColor(Color.PINK);
 					line.setVisible(true);
