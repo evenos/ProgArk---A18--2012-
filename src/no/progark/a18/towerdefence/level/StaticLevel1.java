@@ -209,7 +209,7 @@ public class StaticLevel1 extends TowerDefenceScene{
 
 
 		// load creep texture
-		creepTextureregion = loadTexture("gfx/", "creep1.png", 32, 32);
+		creepTextureregion = loadTexture("gfx/", "creep2.png", 32, 32);
 		
 		// load creep texture
 		towerTextureregion = loadTexture("gfx/", "tower1.png", 32, 32);
