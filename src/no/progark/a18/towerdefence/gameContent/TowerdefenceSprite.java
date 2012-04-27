@@ -8,6 +8,7 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 public abstract class TowerDefenceSprite extends Sprite {
 	
+	
 	private float speedX;
 	private float speedY;
 	
