@@ -9,11 +9,14 @@ import no.progark.a18.towerdefence.gameContent.Cell;
 import no.progark.a18.towerdefence.gameContent.Creep;
 import no.progark.a18.towerdefence.gameContent.Direction;
 import no.progark.a18.towerdefence.gameContent.KillListener;
+import no.progark.a18.towerdefence.gameContent.TouchListener;
 import no.progark.a18.towerdefence.gameContent.Tower;
 import no.progark.a18.towerdefence.gameContent.TowerDefenceSprite;
 
 import org.andengine.engine.handler.IUpdateHandler;
+import org.andengine.entity.IEntity;
 import org.andengine.entity.scene.background.Background;
+import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
@@ -39,6 +42,8 @@ public class Level extends TowerDefenceScene implements KillListener{
 	private Cell goalCell;
 	private Cell[][] backgroundTiles;
 	private Tower[][] towers;
+	private Sprite menuTower;
+	private Tower towerToAdd;
 
 	private Font exitFont;
 	private BitmapTextureAtlas fontTexture;
@@ -54,6 +59,9 @@ public class Level extends TowerDefenceScene implements KillListener{
 	private Direction startDirection = null;
 	
 	private Scanner scanner;
+	
+	private float screenWidth;
+	private float screenHeight;
 	
 	Level(TowerDefenceActivity TowerDefenceActivity, String id) {
 		super();
@@ -73,6 +81,9 @@ public class Level extends TowerDefenceScene implements KillListener{
 		
 		backgroundTiles = new Cell[numRows][numColumns];
 		towers = new Tower[numRows][numColumns];
+		
+		screenWidth = towerDefenceActivity.getWindowManager().getDefaultDisplay().getWidth();
+		screenHeight = towerDefenceActivity.getWindowManager().getDefaultDisplay().getHeight();
 		
 		System.out.println("num columns: " + numColumns);
 		System.out.println("num rows: " + numRows);
@@ -131,6 +142,8 @@ public class Level extends TowerDefenceScene implements KillListener{
 					case('x'): {
 						cell = new Cell(scale * colIndex * 32, scale * rowIndex * 32, 32f, 32f, greenTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 						cell.setDirectionToNextRoad(Direction.LEFT);
+						cell.setTouchListener(new CellTouchListener(colIndex, rowIndex));
+						registerTouchArea(cell);
 						attachChild(cell);
 						break;
 					}
@@ -150,15 +163,100 @@ public class Level extends TowerDefenceScene implements KillListener{
 		setBackground(new Background(Color.RED));
 		
 		addText();
+		addMenue();
 		addCreeps();
 	}
+	
+	public class CellTouchListener implements TouchListener {
+		
+		private final int posX;
+		private final int posY;
+		
+		public CellTouchListener(int posX, int posY) {
+			this.posX = posX;
+			this.posY = posY;
+		}
 
-	public void reatchedtTargt(TowerDefenceSprite sprite) {
-		// TODO Auto-generated method stub
+		public boolean handleTouch(IEntity entity) {
+			Log.d(tag, "THEY TOUCHED ME!!!!");
+			if(towerToAdd == null || towers[posY][posX] != null)
+				return false;
+			towerToAdd.setPosition(backgroundTiles[posY][posX]);
+			towerToAdd.setGridPosX(posX);
+			towerToAdd.setGridPosY(posY);
+			towers[posY][posX] = towerToAdd;
+			attachChild(towerToAdd);
+			towerToAdd = null;
+			Log.d(tag, "User placed a new tower at x:"+posX+" y:"+posY);
+			return true;
+		}
+	}
+	
+	private void addMenue() {
+		exitToMain.setX(screenWidth - exitToMain.getWidth());
+		exitToMain.setY(screenHeight -exitToMain.getHeight() + 5);
+		registerTouchArea(exitToMain);
+		attachChild(exitToMain);
+		
+		menuTower = new Sprite(screenWidth - 64, 32, 32, 32, towerTextureRegion, towerDefenceActivity.getVertexBufferObjectManager()) {
+			@Override
+			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+				towerToAdd = new Tower(0, 0, 32, 32, towerTextureRegion, getVertexBufferObjectManager(), backgroundTiles);
+				Log.d(tag, "User selected a new tower");
+				return true;
+			}
+		};
+
+		menuTower.setScale(3f);
+		registerTouchArea(menuTower);
+		attachChild(menuTower);
+	}
+
+	public void reatchedtTargt(final TowerDefenceSprite sprite) {
+		System.out.println("Weeeehoooooo");
+		//TODO:
+		towerDefenceActivity.runOnUpdateThread(new Runnable() {
+			public void run() {
+				detachChild(sprite);
+			}
+		});
+	}
+	
+	public boolean addTower(int x, int y, Tower tower){
+		if(backgroundTiles[y][x].isRoad() || towers[y][x] != null)
+			return false;
+		
+		towers[y][x] = tower;
+		tower.setX(x*scale*32);
+		tower.setY(y*scale*32);
+		attachChild(tower);
+		return true;
+	}
+	
+	public boolean removeTower(int x, int y){
+		Tower tower = towers[y][x];
+		boolean datatched = detachChild(tower);
+
+		return datatched;
 	}
 
 	public void wasKilled(Creep creep) {
-		// TODO Auto-generated method stub
+		removeCreep(creep);
+	}
+
+	private void removeCreep(final Creep creep) {
+		for(Cell[] row : backgroundTiles)
+			for(Cell cell : row)
+				if(cell.containsCreep(creep))
+					cell.removeCreep(creep);
+		
+		towerDefenceActivity.runOnUpdateThread(new Runnable() {
+			public void run() {
+				detachChild(creep);
+			}
+		});
+		
+		Log.d(tag, "Creep detaqtched");
 	}
 	
 	public void loadResourses() {
@@ -298,7 +396,5 @@ public class Level extends TowerDefenceScene implements KillListener{
 				return true;
 			}
 		};
-		this.registerTouchArea(exitToMain);
-		this.attachChild(exitToMain);
 	}
 }
