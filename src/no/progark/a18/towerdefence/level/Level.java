@@ -1,18 +1,18 @@
 package no.progark.a18.towerdefence.level;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import no.progark.a18.towerdefence.TowerDefenceActivity;
 import no.progark.a18.towerdefence.gameContent.Cell;
 import no.progark.a18.towerdefence.gameContent.Creep;
 import no.progark.a18.towerdefence.gameContent.Direction;
-import no.progark.a18.towerdefence.gameContent.KillListener;
 import no.progark.a18.towerdefence.gameContent.TouchListener;
 import no.progark.a18.towerdefence.gameContent.Tower;
 import no.progark.a18.towerdefence.gameContent.TowerDefenceSprite;
+import no.progark.a18.towerdefence.gameContent.Wave;
 
-import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
@@ -27,15 +27,12 @@ import org.andengine.util.color.Color;
 
 import android.util.Log;
 
-public class Level extends TowerDefenceScene implements KillListener{
+public class Level extends TowerDefenceScene{
 	
 	private final static String tag = Level.class.getName();
 	
 	private int numRows, numColumns;
 	
-	private Cell startCell;
-	private Cell goalCell;
-	private Cell[][] backgroundTiles;
 	private Tower[][] towers;
 	private Sprite menuTower;
 	private Tower towerToAdd;
@@ -66,11 +63,47 @@ public class Level extends TowerDefenceScene implements KillListener{
 		
 		loadProperties();		
 		loadBoard();
+		loadWawes();
+		System.out.println("num waves "+waves.size());
 		
 		setBackground(new Background(Color.RED));
 		
 		addMenue();
-		addCreeps();
+		
+		if(waves != null || waves.size() > 0)
+			attachChild(waves.get(0));
+	}
+
+	private void loadWawes() {
+		final int numberOfWaves = scanner.nextInt();
+		waves = new ArrayList<Wave>();
+		
+		for(int numWave = 0; numWave < numberOfWaves; numWave++){
+			ArrayList<Creep> creeps = new ArrayList<Creep>();
+			ArrayList<Float> spawnDelay = new ArrayList<Float>();
+			
+			String[] stringWaves = scanner.next().trim().split(",");
+			for(String s : stringWaves)
+				if("creep".equals(s))
+					creeps.add(createCreep());
+			String[] stringDelays = scanner.next().trim().split(",");
+			for(String s : stringDelays)
+				spawnDelay.add(Float.valueOf(s));
+			
+			
+			Wave wave = new Wave(creeps, spawnDelay, this);
+			wave.registerWaveFinishedListener(this);
+			waves.add(wave);
+		}
+		//TODO: add the waves
+	}
+	
+	private Creep createCreep() {
+		creep = new Creep(0f, 0f, textureSize, textureSize, creepTextureRegion,
+				towerDefenceActivity.getVertexBufferObjectManager(), this);
+		creep.setSpeed(-300f, 0f);
+		creep.setScale(boardScale - 0.1f);
+		return creep;
 	}
 
 	private void loadBoard() {
@@ -93,44 +126,44 @@ public class Level extends TowerDefenceScene implements KillListener{
 				
 				switch(row[colIndex].charAt(0)) {
 					case('u'): {
-						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, textureSize, textureSize, colIndex, rowIndex, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 						cell.setDirectionToNextRoad(Direction.UP);
 						attachChild(cell);
 						break;
 					}
 					case('r'): {
-						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, textureSize, textureSize, colIndex, rowIndex, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 						cell.setDirectionToNextRoad(Direction.RIGHT);
 						attachChild(cell);
 						break;
 					}
 					case('d'): {
-						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, textureSize, textureSize, colIndex, rowIndex, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 						cell.setDirectionToNextRoad(Direction.DOWN);
 						attachChild(cell);
 						break;
 					}
 					case('l'): {
-						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, textureSize, textureSize, colIndex, rowIndex, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 						cell.setDirectionToNextRoad(Direction.LEFT);
 						attachChild(cell);
 						break;
 					}
 					case('s'): {
-						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, textureSize, textureSize, colIndex, rowIndex, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 						cell.setDirectionToNextRoad(startDirection);
 						startCell = cell;
 						attachChild(cell);
 						break;
 					}
 					case('g'): {
-						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, textureSize, textureSize, colIndex, rowIndex, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 						cell.setDirectionToNextRoad(Direction.LEFT);
 						attachChild(cell);
 						break;
 					}
 					case('x'): {
-						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, 32f, 32f, greenTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, textureSize, textureSize, colIndex, rowIndex, greenTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 						cell.setDirectionToNextRoad(Direction.LEFT);
 						cell.setTouchListener(new CellTouchListener(colIndex, rowIndex));
 						registerTouchArea(cell);
@@ -139,7 +172,7 @@ public class Level extends TowerDefenceScene implements KillListener{
 					}
 					case('t'): {
 						towers[rowIndex][colIndex] = new Tower(colIndex, rowIndex, 32f, 32f, towerTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), backgroundTiles, towerDefenceActivity);
-						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, 32f, 32f, greenTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, textureSize, textureSize, colIndex, rowIndex, greenTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 						towers[rowIndex][colIndex].setPosition(cell);
 						attachChild(cell);
 						attachChild(towers[rowIndex][colIndex]);
@@ -224,24 +257,6 @@ public class Level extends TowerDefenceScene implements KillListener{
 		return datatched;
 	}
 
-	public void wasKilled(Creep creep) {
-		removeCreep(creep);
-	}
-
-	private void removeCreep(final Creep creep) {
-		for(Cell[] row : backgroundTiles)
-			for(Cell cell : row)
-				if(cell.containsCreep(creep))
-					cell.removeCreep(creep);
-		
-		towerDefenceActivity.runOnUpdateThread(new Runnable() {
-			public void run() {
-				detachChild(creep);
-			}
-		});
-		
-		Log.d(tag, "Creep detaqtched");
-	}
 	
 	@Override
 	public void loadResourses() {
@@ -286,84 +301,18 @@ public class Level extends TowerDefenceScene implements KillListener{
 		return textureRegion;
 	}
 	
-	private void addCreeps() {
-		creep = new Creep(boardScale* (numColumns-1) * 32, 0f, 32f, 32f, creepTextureRegion,
-				towerDefenceActivity.getVertexBufferObjectManager(), this, this);
-		creep.setSpeed(-300f, 0f);
-		creep.setScale(boardScale - 0.1f);
-		creep.registerUpdateHandler(new PathFinder(backgroundTiles[0].length-1, 0, creep));
-		startCell.addCreep(creep);
-		attachChild(creep);
-		Log.d(tag, "Added creep sprite");
+	@Override
+	public void winn() {
+		// TODO Auto-generated method stub
+		finished();
 	}
-	
-	private class PathFinder implements IUpdateHandler{
-		private Creep creep;
-		private int posX, posY;
-		
-		public PathFinder(int posX, int posY, Creep creep){
-			this.creep = creep;
-			this.posX = posX;
-			this.posY = posY;
-		}
 
-		public void onUpdate(float pSecondsElapsed) {
-			switch(backgroundTiles[posY][posX].getDirectionToNextRoad()){
-			case LEFT :
-				float boundryLeft = (posX-1) * boardScale * 32;
-				if(creep.getX() < boundryLeft){
-					backgroundTiles[posY][posX--].removeCreep(creep);
-					backgroundTiles[posY][posX].addCreep(creep);
-					changeDir(backgroundTiles[posY][posX].getDirectionToNextRoad());
-				}
-				break;
-			case DOWN :
-				float boundryDown = (posY+1) * boardScale * 32;
-				if(creep.getY() > boundryDown){
-					backgroundTiles[posY++][posX].removeCreep(creep);
-					backgroundTiles[posY][posX].addCreep(creep);
-					changeDir(backgroundTiles[posY][posX].getDirectionToNextRoad());
-				}
-				break;
-			case RIGHT :
-				float boundryRight = (posX+1) * boardScale * 32;
-				if(creep.getX() > boundryRight){
-					backgroundTiles[posY][posX++].removeCreep(creep);
-					backgroundTiles[posY][posX].addCreep(creep);
-					changeDir(backgroundTiles[posY][posX].getDirectionToNextRoad());
-				}
-				break;
-			case UP :
-				float boundryUp = (posY-1) * boardScale * 32 - 16;
-				if(creep.getY() < boundryUp){
-					backgroundTiles[posY--][posX].removeCreep(creep);
-					backgroundTiles[posY][posX].addCreep(creep);
-					changeDir(backgroundTiles[posY][posX].getDirectionToNextRoad());
-				}
-				break;
-			default:
-			}			
-		}
-
-		private void changeDir(Direction dirToNextRoad) {
-			float speed = Math.max(Math.abs(creep.getSpeedX()), Math.abs(creep.getSpeedY()));
-			switch(dirToNextRoad){
-			case LEFT :
-				creep.setSpeed(-speed, 0);
-				break;
-			case DOWN :
-				creep.setSpeed(0, speed);
-				break;
-			case RIGHT :
-				creep.setSpeed(speed, 0);
-				break;
-			case UP :
-				creep.setSpeed(0, -speed);
-				break;
-			default:
-			}
-		}
-
-		public void reset() { }
+	@Override
+	public void loose() {
+		// TODO Auto-generated method stub
+		finished();		
 	}
+
+
+
 }

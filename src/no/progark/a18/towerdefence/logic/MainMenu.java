@@ -1,5 +1,8 @@
 package no.progark.a18.towerdefence.logic;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import no.progark.a18.towerdefence.R;
 import no.progark.a18.towerdefence.TowerDefenceActivity;
 import no.progark.a18.towerdefence.level.Level;
@@ -24,18 +27,24 @@ import android.util.Log;
 public class MainMenu extends Scene {
 	private final static String TAG = MainMenu.class.getName();
 	private final TowerDefenceActivity TDA;
-	private final Background BACKGROUND = new Background(Color.WHITE);
+	private final Background BACKGROUND = new Background(new Color(0.9f, 0.9f, 0.9f, 1f));
+	private float screenWidth, screenHeight;
 
 	private Font exitFont;
 	private BitmapTextureAtlas fontTexture;
 
 	private Text exit;
-	private Text level1, level2;	
+	private Text staticLevel;
+	private Text towerDefenceText;
+	private Text chooselevel;
+	private List<Text> levelTexts = new ArrayList<Text>();
 
 	public MainMenu(final TowerDefenceActivity tda) {
 		super();
 		this.TDA = tda;
 		setBackground(BACKGROUND);
+		screenWidth = TDA.getDisplayWidth();
+		screenHeight = TDA.getDisplayHeight();
 		
 		LevelFactory.setTowerDefenceActivity(TDA);
 
@@ -45,7 +54,7 @@ public class MainMenu extends Scene {
 
 	private void addText(final BaseGameActivity tda) {
 		//Exit text
-		exit = new Text(50, 50, this.exitFont, TDA.getResources().getString(
+		exit = new Text(0, 0, this.exitFont, TDA.getResources().getString(
 				R.string.exit), tda.getVertexBufferObjectManager()) {
 			@Override
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
@@ -55,11 +64,25 @@ public class MainMenu extends Scene {
 				return true;
 			}
 		};
+		exit.setPosition(screenWidth-exit.getWidth()-5, screenHeight-exit.getHeight());
 		this.registerTouchArea(exit);
 		this.attachChild(exit);
 		
-		//Level 1 text
-		level1 = new Text(50, 200, this.exitFont, TDA.getResources().getString(
+		//Game name
+		towerDefenceText = new Text(0, 0, this.exitFont, TDA.getResources().getString(
+				R.string.gameName), tda.getVertexBufferObjectManager());
+		towerDefenceText.setScale(screenWidth*0.3f/towerDefenceText.getWidth());
+		towerDefenceText.setPosition(screenWidth-(towerDefenceText.getX()+(towerDefenceText.getWidth()*towerDefenceText.getScaleX())), (screenHeight-towerDefenceText.getHeight())/2);
+		towerDefenceText.setColor(Color.BLUE);
+		attachChild(towerDefenceText);
+		
+		//Chose level:
+		chooselevel = new Text(5, 5, this.exitFont, TDA.getResources().getString(
+				R.string.chooseLevel), tda.getVertexBufferObjectManager());
+		attachChild(chooselevel);
+		
+		//StaticLevel text
+		staticLevel = new Text(5, chooselevel.getX()+chooselevel.getHeight()+20, this.exitFont, TDA.getResources().getString(
 				R.string.staticLevel), tda.getVertexBufferObjectManager()){
 			@Override
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
@@ -69,14 +92,16 @@ public class MainMenu extends Scene {
 				return true;
 			}
 		};
-		this.registerTouchArea(level1);
-		this.attachChild(level1);
+		levelTexts.add(staticLevel);
+		this.registerTouchArea(staticLevel);
+		this.attachChild(staticLevel);
 		
 		//Dynamic levels
 		final String [] levels = TDA.getResources().getStringArray(R.array.levels);
+		float height = staticLevel.getY()+staticLevel.getHeight();
 		for(int level = 0; level < levels.length; level++){
 			final int lvl = level;
-			level2 = new Text(50, 250, this.exitFont, TDA.getResources().getString(R.string.playLevel)+" "+(level+1), tda.getVertexBufferObjectManager()){
+			Text dynamicLevel = new Text(5, height, this.exitFont, TDA.getResources().getString(R.string.playLevel)+" "+(level+1), tda.getVertexBufferObjectManager()){
 				@Override
 				public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
 						float pTouchAreaLocalX, float pTouchAreaLocalY) {
@@ -85,8 +110,10 @@ public class MainMenu extends Scene {
 					return true;
 				}
 			};
-			this.registerTouchArea(level2);
-			this.attachChild(level2);
+			height = dynamicLevel.getY() + dynamicLevel.getHeight();
+			levelTexts.add(dynamicLevel);
+			this.registerTouchArea(dynamicLevel);
+			this.attachChild(dynamicLevel);
 		}
 	}
 			

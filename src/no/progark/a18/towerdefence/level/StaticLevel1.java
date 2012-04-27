@@ -1,6 +1,7 @@
 package no.progark.a18.towerdefence.level;
 
-import org.andengine.engine.handler.IUpdateHandler;
+import java.util.ArrayList;
+
 import org.andengine.entity.IEntity;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
@@ -18,20 +19,17 @@ import no.progark.a18.towerdefence.TowerDefenceActivity;
 import no.progark.a18.towerdefence.gameContent.Cell;
 import no.progark.a18.towerdefence.gameContent.Direction;
 import no.progark.a18.towerdefence.gameContent.Creep;
-import no.progark.a18.towerdefence.gameContent.KillListener;
 import no.progark.a18.towerdefence.gameContent.TouchListener;
 import no.progark.a18.towerdefence.gameContent.Tower;
-import no.progark.a18.towerdefence.gameContent.TowerDefenceSprite;
+import no.progark.a18.towerdefence.gameContent.Wave;
 
 /**
  * A static scene mainly for testing purposes.
  */
-public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
+public class StaticLevel1 extends TowerDefenceScene{
 	private final static String TAG = StaticLevel1.class.getName();
 	private Tower towerToAdd;
 	
-	private Cell startCell;
-	private Cell[][] backgroundTiles;
 	private Tower[][] towers;
 	private Sprite menuTower;
 
@@ -41,6 +39,7 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 	private ITextureRegion greenTextureRegion;
 	
 	private Creep creep;
+
 
 	/**
 	 * A static scene mainly for testing purposes.
@@ -55,9 +54,22 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		setBackground(new Background(Color.RED));
 		addBackgCells();
 		
+		ArrayList<Creep> creeps = new ArrayList<Creep>();
+		ArrayList<Float> spawnDelay = new ArrayList<Float>();
+		
+		for(int i = 0; i < 10; i++){
+			creeps.add(createCreep());
+			spawnDelay.add(1000f);
+		}
+		
+		waves = new ArrayList<Wave>();
+		waves.add(new Wave(creeps, spawnDelay, this));
+		waves.get(0).registerWaveFinishedListener(this);
+		
 		addMenue();
 		addTower();
-		addCreeps();
+		
+		attachChild(waves.get(currentWave));
 	}
 
 	private void addMenue() {
@@ -108,7 +120,7 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		boolean dir = true;
 		for (int y = 0; y < numRows; y += 2) {
 			for(int x = 1; x < numColls -1; x++){
-				backgroundTiles[y][x] = new Cell(boardScale*x*textureSize, boardScale*y*textureSize, textureSize, textureSize, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+				backgroundTiles[y][x] = new Cell(boardScale*x*textureSize, boardScale*y*textureSize, textureSize, textureSize, x, y, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 				backgroundTiles[y][x].setScale(boardScale);
 				backgroundTiles[y][x].setDirectionToNextRoad(dir?Direction.LEFT : Direction.RIGHT);
 			
@@ -120,10 +132,10 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		dir = true;
 		for (int y = 0; y < numRows; y += 2) {
 			int x = backgroundTiles[y].length-1;
-			backgroundTiles[y][0] = new Cell(boardScale*0*textureSize, boardScale*y*textureSize, textureSize, textureSize, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+			backgroundTiles[y][0] = new Cell(boardScale*0*textureSize, boardScale*y*textureSize, textureSize, textureSize, x, y, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 			backgroundTiles[y][0].setScale(boardScale);
 			backgroundTiles[y][0].setDirectionToNextRoad(dir? Direction.DOWN : Direction.RIGHT);
-			backgroundTiles[y][x] = new Cell(boardScale*x*textureSize, boardScale*y*textureSize, textureSize, textureSize, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+			backgroundTiles[y][x] = new Cell(boardScale*x*textureSize, boardScale*y*textureSize, textureSize, textureSize, x, y,  brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 			backgroundTiles[y][x].setScale(boardScale);
 			backgroundTiles[y][x].setDirectionToNextRoad(dir? Direction.LEFT : Direction.DOWN);
 			
@@ -135,7 +147,7 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		dir = true;
 		for (int y = 1; y < numRows; y += 2) {
 			int x = dir ? 0 : backgroundTiles[y].length-1;
-			backgroundTiles[y][x] = new Cell(boardScale*x*textureSize, boardScale*y*textureSize, textureSize, textureSize, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+			backgroundTiles[y][x] = new Cell(boardScale*x*textureSize, boardScale*y*textureSize, textureSize, textureSize, x, y, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 			backgroundTiles[y][x].setScale(boardScale);
 			backgroundTiles[y][x].setDirectionToNextRoad(Direction.DOWN);
 			
@@ -150,7 +162,7 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 				final int posX = x;
 				if (backgroundTiles[y][x] == null) {
 					backgroundTiles[y][x] = new Cell(boardScale * textureSize * x, boardScale * textureSize
-							* y, 32f, 32f, greenTextureRegion,
+							* y, textureSize, textureSize, x, y, greenTextureRegion,
 							towerDefenceActivity.getVertexBufferObjectManager(), false);
 					backgroundTiles[y][x].setScale(boardScale);
 					backgroundTiles[y][x].setTouchListener(new TouchListener() {
@@ -174,17 +186,17 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		}
 		
 		startCell = backgroundTiles[0][backgroundTiles[0].length-1];
+		goalCell = backgroundTiles[backgroundTiles.length-1][backgroundTiles[0].length-1];
+		goalCell.registerCreepEnteredCellListener(this);
 		
 	}
 
-	private void addCreeps() {
-		creep = new Creep(boardScale* (numColls-1) * 32, 0f, textureSize, textureSize, creepTextureregion,
-				towerDefenceActivity.getVertexBufferObjectManager(), this, this);
+	private Creep createCreep() {
+		creep = new Creep(0f, 0f, textureSize, textureSize, creepTextureregion,
+				towerDefenceActivity.getVertexBufferObjectManager(), this);
 		creep.setSpeed(-300f, 0f);
 		creep.setScale(boardScale - 0.1f);
-		creep.registerUpdateHandler(new PathFinder(backgroundTiles[0].length-1, 0, creep));
-		startCell.addCreep(creep);
-		attachChild(creep);
+		return creep;
 	}
 
 
@@ -228,15 +240,6 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		return textureRegion;
 	}
 
-	public void reatchedtTargt(final TowerDefenceSprite sprite) {
-		System.out.println("Weeeehoooooo");
-		//TODO:
-		towerDefenceActivity.runOnUpdateThread(new Runnable() {
-			public void run() {
-				detachChild(sprite);
-			}
-		});
-	}
 	
 	public boolean addTower(int x, int y, Tower tower){
 		if(backgroundTiles[y][x].isRoad() || towers[y][x] != null)
@@ -255,94 +258,16 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 
 		return datatched;
 	}
+
+	public void loose() {
+		// TODO:handle loose
+		finished();
+	}
 	
-	public void wasKilled(final Creep creep) {
-		removeCreep(creep);
-		playerInfo.addGold(creep.getGoldValue());
-		playerInfo.addScore(creep.getScooreValue());
+	public void winn(){
+		// TODO: handle winn
+		finished();
 	}
 
-	private void removeCreep(final Creep creep) {
-		for(Cell[] row : backgroundTiles)
-			for(Cell cell : row)
-				if(cell.containsCreep(creep))
-					cell.removeCreep(creep);
-		
-		towerDefenceActivity.runOnUpdateThread(new Runnable() {
-			public void run() {
-				detachChild(creep);
-			}
-		});
-		
-	}
-
-	private class PathFinder implements IUpdateHandler{
-		private Creep creep;
-		private int posX, posY;
-		
-		public PathFinder(int posX, int posY, Creep creep){
-			this.creep = creep;
-			this.posX = posX;
-			this.posY = posY;
-		}
 	
-		public void onUpdate(float pSecondsElapsed) {
-			switch(backgroundTiles[posY][posX].getDirectionToNextRoad()){
-			case LEFT :
-				float boundryLeft = (posX-1) * boardScale * 32;
-				if(creep.getX() < boundryLeft){
-					backgroundTiles[posY][posX--].removeCreep(creep);
-					backgroundTiles[posY][posX].addCreep(creep);
-					changeDir(backgroundTiles[posY][posX].getDirectionToNextRoad());
-				}
-				break;
-			case DOWN :
-				float boundryDown = (posY+1) * boardScale * 32;
-				if(creep.getY() > boundryDown){
-					backgroundTiles[posY++][posX].removeCreep(creep);
-					backgroundTiles[posY][posX].addCreep(creep);
-					changeDir(backgroundTiles[posY][posX].getDirectionToNextRoad());
-				}
-				break;
-			case RIGHT :
-				float boundryRight = (posX+1) * boardScale * 32;
-				if(creep.getX() > boundryRight){
-					backgroundTiles[posY][posX++].removeCreep(creep);
-					backgroundTiles[posY][posX].addCreep(creep);
-					changeDir(backgroundTiles[posY][posX].getDirectionToNextRoad());
-				}
-				break;
-			case UP :
-				float boundryUp = (posY-1) * boardScale * 32 - 16;
-				if(creep.getY() > boundryUp){
-					backgroundTiles[posY--][posX].removeCreep(creep);
-					backgroundTiles[posY][posX].addCreep(creep);
-					changeDir(backgroundTiles[posY][posX].getDirectionToNextRoad());
-				}
-				break;
-			default:
-			}			
-		}
-	
-		private void changeDir(Direction dirToNextRoad) {
-			float speed = Math.max(Math.abs(creep.getSpeedX()), Math.abs(creep.getSpeedY()));
-			switch(dirToNextRoad){
-			case LEFT :
-				creep.setSpeed(-speed, 0);
-				break;
-			case DOWN :
-				creep.setSpeed(0, speed);
-				break;
-			case RIGHT :
-				creep.setSpeed(speed, 0);
-				break;
-			case UP :
-				creep.setSpeed(0, -speed);
-				break;
-			default:
-			}
-		}
-	
-		public void reset() { }
-	}
 }
