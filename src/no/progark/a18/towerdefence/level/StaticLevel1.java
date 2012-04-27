@@ -31,7 +31,7 @@ import no.progark.a18.towerdefence.gameContent.TowerDefenceSprite;
 /**
  * A static scene mainly for testing purposes.
  */
-class StaticLevel1 extends TowerDefenceScene  implements KillListener{
+public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 	private final static String TAG = StaticLevel1.class.getName();
 	private final TowerDefenceActivity TDA;
 	private Tower towerToAdd;
@@ -55,7 +55,7 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 	
 	private PlayerInfo playerInfo;
 	private Creep creep;
-	private Text exitToMain, money;
+	private Text exitToMain, money, life;
 	private float screenWidth;
 	private float screenHeight;
 
@@ -79,7 +79,7 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		loadResourses();
 
 		setBackground(new Background(Color.RED));
-		playerInfo = new PlayerInfo();
+		playerInfo = new PlayerInfo(this);
 		
 		addBackgCells();
 		addText();
@@ -97,6 +97,10 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		money.setX(screenWidth - money.getWidth()-100);
 		money.setY(screenHeight -money.getHeight() + 5);
 		attachChild(money);
+		
+		life.setX(screenWidth - life.getWidth()-200);
+		life.setY(screenHeight -life.getHeight() + 5);
+		attachChild(life);
 		
 		menuTower = new Sprite(screenWidth - 64, 32, 32, 32, towerTextureregion, TDA.getVertexBufferObjectManager()){
 			@Override
@@ -221,22 +225,24 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		};
 		
 		//Adding the money text
-		money = new Text(0, 50, this.exitFont, "Gold:"+playerInfo.getMoney(), TDA.getVertexBufferObjectManager());
+		money = new Text(0, 50, this.exitFont, "Gold:"+playerInfo.getgold(), TDA.getVertexBufferObjectManager());
 		
+		//Adding the life text
+		life = new Text(0, 50, this.exitFont, "Life:"+playerInfo.getLife(), TDA.getVertexBufferObjectManager());
 	}
+	
 	/**
-	 * Adds gold to the player. Called when killing creeps.
+	 * Updates the textfield for life amount
 	 */
-	private void addGold(int amount){
-		playerInfo.setMoney(playerInfo.getMoney()+amount);
-		money.setText("Gold:"+playerInfo.getMoney());
+	public void updateLife(){
+		money.setText("Gold:"+playerInfo.getgold());
 	}
+	
 	/**
-	 * Subtracts money from the player. Called when buying towers.
+	 * Updates the textfield for the gold field
 	 */
-	private void subtractGold(int amount){
-		playerInfo.setMoney(playerInfo.getMoney()-amount);
-		money.setText("Gold:"+playerInfo.getMoney());
+	public void updateGold(){
+		money.setText("Gold:"+playerInfo.getLife());
 	}
 
 	public void loadResourses() {
