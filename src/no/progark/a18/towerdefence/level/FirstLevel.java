@@ -25,6 +25,7 @@ public class FirstLevel extends Scene {
 	private final TowerDefenceActivity tda;
 	private Font exitFont;
 	private BitmapTextureAtlas fontTexture;
+
 	private float displayHeight;
 	private float displayWidth;
 	

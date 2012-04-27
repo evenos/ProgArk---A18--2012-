@@ -1,7 +1,9 @@
 package no.progark.a18.towerdefence.level;
 
 import org.andengine.engine.handler.IUpdateHandler;
+import org.andengine.entity.IEntity;
 import org.andengine.entity.scene.background.Background;
+import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
@@ -21,6 +23,7 @@ import no.progark.a18.towerdefence.gameContent.Cell;
 import no.progark.a18.towerdefence.gameContent.Direction;
 import no.progark.a18.towerdefence.gameContent.Creep;
 import no.progark.a18.towerdefence.gameContent.KillListener;
+import no.progark.a18.towerdefence.gameContent.TouchListener;
 import no.progark.a18.towerdefence.gameContent.Tower;
 import no.progark.a18.towerdefence.gameContent.TowerDefenceSprite;
 
@@ -30,6 +33,7 @@ import no.progark.a18.towerdefence.gameContent.TowerDefenceSprite;
 class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 	private final static String TAG = StaticLevel1.class.getName();
 	private final TowerDefenceActivity TDA;
+	private Tower towerToAdd;
 
 	private float scale = 1.25f;
 	
@@ -38,6 +42,7 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 	private Cell startCell;
 	private Cell[][] backgroundTiles;
 	private Tower[][] towers;
+	private Sprite menuTower;
 
 	private Font exitFont;
 	private BitmapTextureAtlas fontTexture;
@@ -49,6 +54,8 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 
 	private Creep creep;
 	private Text exitToMain;
+	private float screenWidth;
+	private float screenHeight;
 
 	/**
 	 * A static scene mainly for testing purposes.
@@ -64,14 +71,39 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		backgroundTiles = new Cell[numRows][numColls];
 		towers = new Tower[numRows][numColls];
 		
+		screenWidth = TDA.getWindowManager().getDefaultDisplay().getWidth();
+		screenHeight = TDA.getWindowManager().getDefaultDisplay().getHeight();
+		
 		loadResourses();
 
 		setBackground(new Background(Color.RED));
 		
 		addBackgCells();
 		addText();
+		addMenue();
 		addTower();
 		addCreeps();
+	}
+
+	private void addMenue() {
+		exitToMain.setX(screenWidth - exitToMain.getWidth());
+		exitToMain.setY(screenHeight -exitToMain.getHeight() + 5);
+		registerTouchArea(exitToMain);
+		attachChild(exitToMain);
+		
+		menuTower = new Sprite(screenWidth - 64, 32, 32, 32, towerTextureregion, TDA.getVertexBufferObjectManager()){
+			@Override
+			public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
+					float pTouchAreaLocalX, float pTouchAreaLocalY) {
+				towerToAdd = new Tower(0, 0, 32, 32, towerTextureregion, getVertexBufferObjectManager(), backgroundTiles);
+				Log.d(TAG, "User selected a new tower");
+				return true;
+			}
+		};
+
+		menuTower.setScale(3f);
+		registerTouchArea(menuTower);
+		attachChild(menuTower);
 	}
 
 	private void addTower() {
@@ -120,14 +152,33 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		}
 
 		// Add green to the rest of the board
-		for (int x = 0; x < backgroundTiles.length; x++) {
-			for (int y = 0; y < backgroundTiles[x].length; y++) {
-				if (backgroundTiles[x][y] == null) {
-					backgroundTiles[x][y] = new Cell(scale * 32 * y, scale * 32
-							* x, 32f, 32f, greenTextureRegion,
+		for (int y = 0; y < numRows; y++) {
+			for (int x = 0; x < numColls; x++) {
+				final int posY = y;
+				final int posX = x;
+				if (backgroundTiles[y][x] == null) {
+					backgroundTiles[y][x] = new Cell(scale * 32 * x, scale * 32
+							* y, 32f, 32f, greenTextureRegion,
 							TDA.getVertexBufferObjectManager(), false);
-					backgroundTiles[x][y].setScale(scale);
-					attachChild(backgroundTiles[x][y]);
+					backgroundTiles[y][x].setScale(scale);
+					backgroundTiles[y][x].setTouchListener(new TouchListener() {
+						
+						public boolean handleTouch(IEntity entity) {
+							Log.d(TAG, "THEY TOUCHED ME!!!!");
+							if(towerToAdd == null || towers[posY][posX] != null)
+								return false;
+							towerToAdd.setPosition(backgroundTiles[posY][posX]);
+							towerToAdd.setGridPosX(posX);
+							towerToAdd.setGridPosY(posY);
+							towers[posY][posX] = towerToAdd;
+							attachChild(towerToAdd);
+							towerToAdd = null;
+							Log.d(TAG, "User placed a new tower at x:"+posX+" y:"+posY);
+							return true;
+						}
+					});
+					registerTouchArea(backgroundTiles[y][x]);
+					attachChild(backgroundTiles[y][x]);
 				}
 			}
 		}
@@ -161,8 +212,6 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 				return true;
 			}
 		};
-		this.registerTouchArea(exitToMain);
-		this.attachChild(exitToMain);
 	}
 
 	public void loadResourses() {
@@ -208,9 +257,14 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		return textureRegion;
 	}
 
-	public void reatchedtTargt(TowerDefenceSprite sprite) {
+	public void reatchedtTargt(final TowerDefenceSprite sprite) {
 		System.out.println("Weeeehoooooo");
 		//TODO:
+		TDA.runOnUpdateThread(new Runnable() {
+			public void run() {
+				detachChild(sprite);
+			}
+		});
 	}
 	
 	public boolean addTower(int x, int y, Tower tower){
@@ -231,6 +285,25 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		return datatched;
 	}
 	
+	public void wasKilled(final Creep creep) {
+		removeCreep(creep);
+	}
+
+	private void removeCreep(final Creep creep) {
+		for(Cell[] row : backgroundTiles)
+			for(Cell cell : row)
+				if(cell.containsCreep(creep))
+					cell.removeCreep(creep);
+		
+		TDA.runOnUpdateThread(new Runnable() {
+			public void run() {
+				detachChild(creep);
+			}
+		});
+		
+		Log.d(TAG, "Creep detaqtched");
+	}
+
 	private class PathFinder implements IUpdateHandler{
 		private Creep creep;
 		private int posX, posY;
@@ -240,7 +313,7 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 			this.posX = posX;
 			this.posY = posY;
 		}
-
+	
 		public void onUpdate(float pSecondsElapsed) {
 			switch(backgroundTiles[posY][posX].getDirectionToNextRoad()){
 			case LEFT :
@@ -278,7 +351,7 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 			default:
 			}			
 		}
-
+	
 		private void changeDir(Direction dirToNextRoad) {
 			float speed = Math.max(Math.abs(creep.getSpeedX()), Math.abs(creep.getSpeedY()));
 			switch(dirToNextRoad){
@@ -297,22 +370,7 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 			default:
 			}
 		}
-
+	
 		public void reset() { }
-	}
-
-	public void wasKilled(final Creep creep) {
-		for(Cell[] row : backgroundTiles)
-			for(Cell cell : row)
-				if(cell.containsCreep(creep))
-					cell.removeCreep(creep);
-		
-		TDA.runOnUpdateThread(new Runnable() {
-			public void run() {
-				detachChild(creep);
-			}
-		});
-		
-		Log.d(TAG, "Creep detaqtched");
 	}
 }

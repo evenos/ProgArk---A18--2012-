@@ -3,7 +3,9 @@ package no.progark.a18.towerdefence.gameContent;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
@@ -13,6 +15,7 @@ public class Cell extends Sprite {
 	private Direction directionToNextRoad;
 	private boolean isGoal;
 	private List<Creep> creeps;
+	private TouchListener touchListener;
 
 	public Cell(float posX, float posY,
 				float pWidth, float pHeight,
@@ -25,6 +28,7 @@ public class Cell extends Sprite {
 		this.isRoad = isRoad;
 		this.isGoal = isGoal;
 		this.creeps = new ArrayList<Creep>();
+		
 	}
 	
 	public Cell(float posX, float posY,
@@ -34,6 +38,19 @@ public class Cell extends Sprite {
 				boolean isRoad) {
 		
 		this(posX, posY, pWidth, pHeight, pTextureRegion, pVertexBufferObjectManager, isRoad, false);
+	}
+	
+	@Override
+	public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
+			float pTouchAreaLocalX, float pTouchAreaLocalY) {
+		if(touchListener == null) return false;
+		return touchListener.handleTouch(this);
+	}
+	
+	
+
+	public void setTouchListener(TouchListener touchListener) {
+		this.touchListener = touchListener;
 	}
 
 	public Direction getDirectionToNextRoad() {

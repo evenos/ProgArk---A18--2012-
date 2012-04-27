@@ -6,8 +6,6 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 public class Tower extends Sprite {
-	
-	private static final String tag = Tower.class.getName();
 	private int gridPosX;
 	private int gridPosY;
 	private int damage;
@@ -29,6 +27,24 @@ public class Tower extends Sprite {
 
 		registerUpdateHandler(new AttackHandler(1f));
 	}
+
+
+	public int getgridPosX() {
+		return gridPosY;
+	}
+	
+	public void setGridPosX(int gridPosX){
+		this.gridPosX = gridPosX;
+	}
+
+	public int getGridPosY() {
+		return gridPosY;
+	}
+	
+	public void setGridPosY(int gridPosY){
+		this.gridPosY = gridPosY;
+	}
+
 
 	private class AttackHandler implements IUpdateHandler {
 		
