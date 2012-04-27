@@ -4,9 +4,12 @@
     <string name="hello">Hello World, TowerDefenceActivity!</string>
     <string name="app_name">TowerDefence</string>
     <string name="exit">Exit</string>
-    <string name="playLevelOne">Play level 1</string>
+    <string name="staticLevel">Play static level</string>
     <string name="returnToMain">Exit</string>
-    <string name="PlayLevelTwo">Spell</string>
+    <string name="playLevel">Play level</string>
     <string name="score">Score: </string>
+    <string-array name="levels">
+        <item >level1.lvl</item>
+    </string-array>
 
 </resources>

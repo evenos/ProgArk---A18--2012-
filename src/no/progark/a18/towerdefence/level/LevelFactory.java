@@ -28,9 +28,9 @@ public class LevelFactory {
 	 * @return the loaded scene or null if non were found.
 	 */
 	public static Scene getLevel(String id) {
-		if ("1".equals(id))
+		if ("static".equals(id))
 			return new StaticLevel1(TDA);
-		if ("2".equals(id))
+		else if(id != null)
 			return new Level(TDA, id);
 //		return new FirstLevel(TDA);
 		// TODO: Load from local fileSystem

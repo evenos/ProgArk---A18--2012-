@@ -2,6 +2,7 @@ package no.progark.a18.towerdefence.logic;
 
 import no.progark.a18.towerdefence.R;
 import no.progark.a18.towerdefence.TowerDefenceActivity;
+import no.progark.a18.towerdefence.level.Level;
 import no.progark.a18.towerdefence.level.LevelFactory;
 
 import org.andengine.entity.scene.Scene;
@@ -59,30 +60,34 @@ public class MainMenu extends Scene {
 		
 		//Level 1 text
 		level1 = new Text(50, 200, this.exitFont, TDA.getResources().getString(
-				R.string.playLevelOne), tda.getVertexBufferObjectManager()){
+				R.string.staticLevel), tda.getVertexBufferObjectManager()){
 			@Override
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
 					float pTouchAreaLocalX, float pTouchAreaLocalY) {
 				Log.d(TAG, "Level1 button, pushing level1");
-				TDA.pushState(LevelFactory.getLevel("1"));
+				TDA.pushState(LevelFactory.getLevel("static"));
 				return true;
 			}
 		};
 		this.registerTouchArea(level1);
 		this.attachChild(level1);
 		
-		//Level 2 text
-		level2 = new Text(50, 250, this.exitFont, TDA.getResources().getString(R.string.PlayLevelTwo), tda.getVertexBufferObjectManager()){
-			@Override
-			public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
-					float pTouchAreaLocalX, float pTouchAreaLocalY) {
-				Log.d(TAG, "Level1 button, pushing level1");
-				TDA.pushState(LevelFactory.getLevel("2"));
-				return true;
-			}
-		};
-		this.registerTouchArea(level2);
-		this.attachChild(level2);
+		//Dynamic levels
+		final String [] levels = TDA.getResources().getStringArray(R.array.levels);
+		for(int level = 0; level < levels.length; level++){
+			final int lvl = level;
+			level2 = new Text(50, 250, this.exitFont, TDA.getResources().getString(R.string.playLevel)+" "+(level+1), tda.getVertexBufferObjectManager()){
+				@Override
+				public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
+						float pTouchAreaLocalX, float pTouchAreaLocalY) {
+					Log.d(TAG, "Level1 button, pushing level1");
+					TDA.pushState(new Level(TDA, levels[lvl]));
+					return true;
+				}
+			};
+			this.registerTouchArea(level2);
+			this.attachChild(level2);
+		}
 	}
 			
 	public void loadResourses(final BaseGameActivity tda) {

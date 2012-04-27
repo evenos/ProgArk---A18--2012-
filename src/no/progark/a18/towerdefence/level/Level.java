@@ -54,12 +54,12 @@ public class Level extends TowerDefenceScene implements KillListener{
 	
 	private Scanner scanner;
 	
-	Level(TowerDefenceActivity TowerDefenceActivity, String id) {
+	public Level(TowerDefenceActivity TowerDefenceActivity, String id) {
 		super(TowerDefenceActivity);
 		
 		
 		try {
-			scanner = new Scanner(towerDefenceActivity.getResources().getAssets().open(id + ".txt"));
+			scanner = new Scanner(towerDefenceActivity.getResources().getAssets().open(id));
 		} catch (IOException e) {
 			Log.e(tag, "Scanner IOException", e);
 		}
