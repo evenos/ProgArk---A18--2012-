@@ -1,11 +1,32 @@
 package no.progark.a18.towerdefence.gameContent;
+
+import no.progark.a18.towerdefence.level.StaticLevel1;
+
+
 /**
  * Player values connected to the game
  */
 public class PlayerInfo {
 	
 	private int life;
-	private int money;
+	private int gold;
+	private StaticLevel1 level;
+
+	public PlayerInfo(String difficulty, StaticLevel1 level){
+		if(difficulty.equals("easy"))
+			life=15;
+		else if(difficulty.equals("medium"))
+			life=10;
+		else
+			life=1;
+		
+		this.level = level;
+	}
+	
+	public PlayerInfo(StaticLevel1 level){
+		life=3;
+		this.level = level;
+	}
 
 	/**
 	 * @return the life
@@ -13,26 +34,34 @@ public class PlayerInfo {
 	public int getLife() {
 		return life;
 	}
+	
+	public void subtractLife(int amount){
+		life-=amount;
+		level.updateLife();
+	}
+
 
 	/**
-	 * @param life the life to set
+	 * @return the gold
 	 */
-	public void setLife(int life) {
-		this.life = life;
+	public int getgold() {
+		return gold;
 	}
 
 	/**
-	 * @return the money
+	 * @param gold the gold to add
 	 */
-	public int getMoney() {
-		return money;
+	public void addGold(int gold) {
+		this.gold = gold;
+		level.updateGold();
 	}
-
+	
 	/**
-	 * @param money the money to set
+	 * @param gold the gold to subtract
 	 */
-	public void setMoney(int money) {
-		this.money = money;
+	public void subtractGold(int gold) {
+		this.gold = gold;
+		level.updateGold();
 	}
 
 }

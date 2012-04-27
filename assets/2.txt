@@ -1,0 +1,14 @@
+16
+11
+LEFT
+d,l,l,l,l,l,l,d,l,l,l,l,l,l,l,s
+d,x,x,x,x,x,x,d,t,u,x,x,x,x,x,x
+r,r,r,r,r,r,r,r,r,u,r,r,r,r,r,d
+x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,d
+d,l,l,l,l,l,l,l,l,l,l,l,l,l,l,l
+d,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x
+r,r,r,r,r,r,r,r,r,r,r,r,r,r,r,d
+x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,d
+d,l,l,l,l,l,l,l,l,l,l,l,l,l,l,l
+d,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x
+r,r,r,r,r,r,r,r,r,r,r,r,r,r,r,g

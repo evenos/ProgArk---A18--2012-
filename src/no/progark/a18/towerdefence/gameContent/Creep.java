@@ -10,6 +10,15 @@ public class Creep extends TowerDefenceSprite {
 	
 	private int hp = 20;
 	private int scooreValue = 100;
+	private int goldValue = 1;
+	public int getGoldValue() {
+		return goldValue;
+	}
+
+	public void setGoldValue(int goldValue) {
+		this.goldValue = goldValue;
+	}
+
 	public int getScooreValue() {
 		return scooreValue;
 	}
