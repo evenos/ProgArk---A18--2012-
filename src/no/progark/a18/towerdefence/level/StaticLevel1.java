@@ -257,9 +257,14 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		return textureRegion;
 	}
 
-	public void reatchedtTargt(TowerDefenceSprite sprite) {
+	public void reatchedtTargt(final TowerDefenceSprite sprite) {
 		System.out.println("Weeeehoooooo");
 		//TODO:
+		TDA.runOnUpdateThread(new Runnable() {
+			public void run() {
+				detachChild(sprite);
+			}
+		});
 	}
 	
 	public boolean addTower(int x, int y, Tower tower){
@@ -281,6 +286,10 @@ class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 	}
 	
 	public void wasKilled(final Creep creep) {
+		removeCreep(creep);
+	}
+
+	private void removeCreep(final Creep creep) {
 		for(Cell[] row : backgroundTiles)
 			for(Cell cell : row)
 				if(cell.containsCreep(creep))
