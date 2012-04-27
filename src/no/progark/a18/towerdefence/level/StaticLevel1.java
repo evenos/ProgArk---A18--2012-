@@ -4,10 +4,7 @@ import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
-import org.andengine.opengl.font.Font;
-import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
@@ -17,13 +14,11 @@ import org.andengine.util.color.Color;
 
 import android.util.Log;
 
-import no.progark.a18.towerdefence.R;
 import no.progark.a18.towerdefence.TowerDefenceActivity;
 import no.progark.a18.towerdefence.gameContent.Cell;
 import no.progark.a18.towerdefence.gameContent.Direction;
 import no.progark.a18.towerdefence.gameContent.Creep;
 import no.progark.a18.towerdefence.gameContent.KillListener;
-import no.progark.a18.towerdefence.gameContent.PlayerInfo;
 import no.progark.a18.towerdefence.gameContent.TouchListener;
 import no.progark.a18.towerdefence.gameContent.Tower;
 import no.progark.a18.towerdefence.gameContent.TowerDefenceSprite;
@@ -32,19 +27,7 @@ import no.progark.a18.towerdefence.gameContent.TowerDefenceSprite;
  * A static scene mainly for testing purposes.
  */
 public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
-	private final static float bardRegionWidth = 0.8f;
-	private final static float menuRegionWidth = 1f-bardRegionWidth;
-	
-	private float screenWidth;
-	private float screenHeight;
-	
-	private int numRows, numColls;
-	
-	private float boardScale;
-	private float menuScale;
-	
 	private final static String TAG = StaticLevel1.class.getName();
-	private final TowerDefenceActivity TDA;
 	private Tower towerToAdd;
 	
 	private Cell startCell;
@@ -52,17 +35,12 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 	private Tower[][] towers;
 	private Sprite menuTower;
 
-	private Font exitFont;
-	private BitmapTextureAtlas fontTexture;
-
 	private ITextureRegion creepTextureregion;
 	private ITextureRegion towerTextureregion;
 	private ITextureRegion brownTextureRegion;
 	private ITextureRegion greenTextureRegion;
 	
-	private PlayerInfo playerInfo;
 	private Creep creep;
-	private Text exitToMain, money, life;
 
 	/**
 	 * A static scene mainly for testing purposes.
@@ -70,28 +48,13 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 	 * @param tda the games {@linkplain BaseGameActivity}
 	 */
 	StaticLevel1(TowerDefenceActivity tda) {
-		super();
-		this.TDA = tda;
-		
-		numColls = 16;
-		numRows = 11;
-		
-		screenWidth = TDA.getWindowManager().getDefaultDisplay().getWidth();
-		screenHeight = TDA.getWindowManager().getDefaultDisplay().getHeight();
-		
-		boardScale= ((float)(screenWidth * bardRegionWidth)) / (numColls*32);
-		menuScale = ((float)(screenWidth * menuRegionWidth)) / (2f*32);
-		
+		super(tda);
+
 		backgroundTiles = new Cell[numRows][numColls];
 		towers = new Tower[numRows][numColls];
-		
-		loadResourses();
-
 		setBackground(new Background(Color.RED));
-		playerInfo = new PlayerInfo(this);
-		
 		addBackgCells();
-		addText();
+		
 		addMenue();
 		addTower();
 		addCreeps();
@@ -103,23 +66,29 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		registerTouchArea(exitToMain);
 		attachChild(exitToMain);
 		
+		final float spacing = screenWidth / 3.5f;
 		life.setX(0);
 		life.setY(screenHeight -life.getHeight() + 5);
 		
-		money.setX(life.getX() + life.getWidth() + 5);
+		money.setX(life.getX() + spacing);
 		money.setY(screenHeight -money.getHeight() + 5);
+		
+		score.setX(money.getX() + spacing);
+		score.setY(screenHeight -score.getHeight() + 5);
 		
 		updateLife();
 		updateGold();
+		updateScore();
 		
 		attachChild(money);
 		attachChild(life);
+		attachChild(score);
 		
-		menuTower = new Sprite(screenWidth - 64, 32, 32, 32, towerTextureregion, TDA.getVertexBufferObjectManager()){
+		menuTower = new Sprite(screenWidth - 2*textureSize, textureSize, textureSize, textureSize, towerTextureregion, towerDefenceActivity.getVertexBufferObjectManager()){
 			@Override
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
 					float pTouchAreaLocalX, float pTouchAreaLocalY) {
-				towerToAdd = new Tower(0, 0, 32, 32, towerTextureregion, getVertexBufferObjectManager(), backgroundTiles, TDA);
+				towerToAdd = new Tower(0, 0, textureSize, textureSize, towerTextureregion, getVertexBufferObjectManager(), backgroundTiles, towerDefenceActivity);
 				return true;
 			}
 		};
@@ -130,7 +99,7 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 	}
 
 	private void addTower() {
-		Tower tower = new Tower(numColls-2, 1, 32, 32, towerTextureregion, TDA.getVertexBufferObjectManager(), backgroundTiles, TDA);
+		Tower tower = new Tower(numColls-2, 1, textureSize, textureSize, towerTextureregion, towerDefenceActivity.getVertexBufferObjectManager(), backgroundTiles, towerDefenceActivity);
 		addTower(numColls-2, 1, tower);
 	}
 
@@ -139,7 +108,7 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		boolean dir = true;
 		for (int y = 0; y < numRows; y += 2) {
 			for(int x = 1; x < numColls -1; x++){
-				backgroundTiles[y][x] = new Cell(boardScale*x*32, boardScale*y*32, 32, 32, brownTextureRegion, TDA.getVertexBufferObjectManager(), true);
+				backgroundTiles[y][x] = new Cell(boardScale*x*textureSize, boardScale*y*textureSize, textureSize, textureSize, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 				backgroundTiles[y][x].setScale(boardScale);
 				backgroundTiles[y][x].setDirectionToNextRoad(dir?Direction.LEFT : Direction.RIGHT);
 			
@@ -151,10 +120,10 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		dir = true;
 		for (int y = 0; y < numRows; y += 2) {
 			int x = backgroundTiles[y].length-1;
-			backgroundTiles[y][0] = new Cell(boardScale*0*32, boardScale*y*32, 32, 32, brownTextureRegion, TDA.getVertexBufferObjectManager(), true);
+			backgroundTiles[y][0] = new Cell(boardScale*0*textureSize, boardScale*y*textureSize, textureSize, textureSize, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 			backgroundTiles[y][0].setScale(boardScale);
 			backgroundTiles[y][0].setDirectionToNextRoad(dir? Direction.DOWN : Direction.RIGHT);
-			backgroundTiles[y][x] = new Cell(boardScale*x*32, boardScale*y*32, 32, 32, brownTextureRegion, TDA.getVertexBufferObjectManager(), true);
+			backgroundTiles[y][x] = new Cell(boardScale*x*textureSize, boardScale*y*textureSize, textureSize, textureSize, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 			backgroundTiles[y][x].setScale(boardScale);
 			backgroundTiles[y][x].setDirectionToNextRoad(dir? Direction.LEFT : Direction.DOWN);
 			
@@ -166,7 +135,7 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		dir = true;
 		for (int y = 1; y < numRows; y += 2) {
 			int x = dir ? 0 : backgroundTiles[y].length-1;
-			backgroundTiles[y][x] = new Cell(boardScale*x*32, boardScale*y*32, 32, 32, brownTextureRegion, TDA.getVertexBufferObjectManager(), true);
+			backgroundTiles[y][x] = new Cell(boardScale*x*textureSize, boardScale*y*textureSize, textureSize, textureSize, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 			backgroundTiles[y][x].setScale(boardScale);
 			backgroundTiles[y][x].setDirectionToNextRoad(Direction.DOWN);
 			
@@ -180,9 +149,9 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 				final int posY = y;
 				final int posX = x;
 				if (backgroundTiles[y][x] == null) {
-					backgroundTiles[y][x] = new Cell(boardScale * 32 * x, boardScale * 32
+					backgroundTiles[y][x] = new Cell(boardScale * textureSize * x, boardScale * textureSize
 							* y, 32f, 32f, greenTextureRegion,
-							TDA.getVertexBufferObjectManager(), false);
+							towerDefenceActivity.getVertexBufferObjectManager(), false);
 					backgroundTiles[y][x].setScale(boardScale);
 					backgroundTiles[y][x].setTouchListener(new TouchListener() {
 						
@@ -209,8 +178,8 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 	}
 
 	private void addCreeps() {
-		creep = new Creep(boardScale* (numColls-1) * 32, 0f, 32f, 32f, creepTextureregion,
-				TDA.getVertexBufferObjectManager(), this, this);
+		creep = new Creep(boardScale* (numColls-1) * 32, 0f, textureSize, textureSize, creepTextureregion,
+				towerDefenceActivity.getVertexBufferObjectManager(), this, this);
 		creep.setSpeed(-300f, 0f);
 		creep.setScale(boardScale - 0.1f);
 		creep.registerUpdateHandler(new PathFinder(backgroundTiles[0].length-1, 0, creep));
@@ -218,53 +187,14 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		attachChild(creep);
 	}
 
-	private void addText() {
 
-		// Level 1 text
-		exitToMain = new Text(200, 50, this.exitFont, TDA.getResources()
-				.getString(R.string.returnToMain),
-				TDA.getVertexBufferObjectManager()) {
-			@Override
-			public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
-					float pTouchAreaLocalX, float pTouchAreaLocalY) {
-				Log.d(TAG, "Exiting StaticLevel1");
-				TDA.popState();
-				return true;
-			}
-		};
-		
-
-		//Adding the money text
-		money = new Text(0, 50, this.exitFont, "Gold:"+Integer.MIN_VALUE, TDA.getVertexBufferObjectManager());
-		
-		//Adding the life text
-		life = new Text(0, 50, this.exitFont, "Life:"+Integer.MIN_VALUE, TDA.getVertexBufferObjectManager());
-	}
 	
-	/**
-	 * Updates the textfield for life amount
-	 */
-	public void updateLife(){
-		money.setText("Life:"+playerInfo.getLife());
-	}
-	
-	/**
-	 * Updates the textfield for the gold field
-	 */
-	public void updateGold(){
-		life.setText("Gold:"+playerInfo.getgold());
-	}
 
+	
+	@Override
 	public void loadResourses() {
 		// Load font texture
-		this.fontTexture = new BitmapTextureAtlas(TDA.getTextureManager(), 256,
-				256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 
-		this.exitFont = FontFactory.createFromAsset(TDA.getFontManager(),
-				this.fontTexture, TDA.getAssets(), "Sabatica-regular.ttf", 48,
-				true, Color.BLACK.getABGRPackedInt());
-		TDA.getEngine().getTextureManager().loadTexture(this.fontTexture);
-		TDA.getFontManager().loadFont(this.exitFont);
 
 		// load creep texture
 		creepTextureregion = loadTexture("gfx/", "creep1.png", 32, 32);
@@ -285,13 +215,13 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath(path);
 
 		BitmapTextureAtlas brownTexture = new BitmapTextureAtlas(
-				TDA.getTextureManager(), x, y,
+				towerDefenceActivity.getTextureManager(), x, y,
 				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 
 		ITextureRegion textureRegion = BitmapTextureAtlasTextureRegionFactory
-				.createFromAsset(brownTexture, TDA, fileName, 0, 0);
+				.createFromAsset(brownTexture, towerDefenceActivity, fileName, 0, 0);
 
-		TDA.getEngine().getTextureManager().loadTexture(brownTexture);
+		towerDefenceActivity.getEngine().getTextureManager().loadTexture(brownTexture);
 
 		Log.d(TAG, "Loaded " + fileName + " texture");
 
@@ -301,7 +231,7 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 	public void reatchedtTargt(final TowerDefenceSprite sprite) {
 		System.out.println("Weeeehoooooo");
 		//TODO:
-		TDA.runOnUpdateThread(new Runnable() {
+		towerDefenceActivity.runOnUpdateThread(new Runnable() {
 			public void run() {
 				detachChild(sprite);
 			}
@@ -329,6 +259,7 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 	public void wasKilled(final Creep creep) {
 		removeCreep(creep);
 		playerInfo.addGold(creep.getGoldValue());
+		playerInfo.addScore(creep.getScooreValue());
 	}
 
 	private void removeCreep(final Creep creep) {
@@ -337,7 +268,7 @@ public class StaticLevel1 extends TowerDefenceScene  implements KillListener{
 				if(cell.containsCreep(creep))
 					cell.removeCreep(creep);
 		
-		TDA.runOnUpdateThread(new Runnable() {
+		towerDefenceActivity.runOnUpdateThread(new Runnable() {
 			public void run() {
 				detachChild(creep);
 			}

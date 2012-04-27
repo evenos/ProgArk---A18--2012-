@@ -3,16 +3,11 @@ package no.progark.a18.towerdefence.gameContent;
 import no.progark.a18.towerdefence.TowerDefenceActivity;
 
 import org.andengine.engine.handler.IUpdateHandler;
-import org.andengine.engine.handler.timer.ITimerCallback;
-import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.entity.primitive.Line;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.opengl.texture.region.ITextureRegion;
-import org.andengine.opengl.vbo.DrawType;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.color.Color;
-
-import android.util.Log;
 
 public class Tower extends Sprite {
 	private int gridPosX;

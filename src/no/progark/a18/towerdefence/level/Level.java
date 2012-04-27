@@ -3,7 +3,6 @@ package no.progark.a18.towerdefence.level;
 import java.io.IOException;
 import java.util.Scanner;
 
-import no.progark.a18.towerdefence.R;
 import no.progark.a18.towerdefence.TowerDefenceActivity;
 import no.progark.a18.towerdefence.gameContent.Cell;
 import no.progark.a18.towerdefence.gameContent.Creep;
@@ -17,7 +16,6 @@ import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.font.FontFactory;
@@ -32,9 +30,6 @@ import android.util.Log;
 public class Level extends TowerDefenceScene implements KillListener{
 	
 	private final static String tag = Level.class.getName();
-	private final TowerDefenceActivity towerDefenceActivity;
-
-	private float scale = 1.25f;
 	
 	private int numRows, numColumns;
 	
@@ -54,45 +49,40 @@ public class Level extends TowerDefenceScene implements KillListener{
 	private ITextureRegion greenTextureRegion;
 
 	private Creep creep;
-	private Text exitToMain;
 	
 	private Direction startDirection = null;
 	
 	private Scanner scanner;
 	
-	private float screenWidth;
-	private float screenHeight;
-	
 	Level(TowerDefenceActivity TowerDefenceActivity, String id) {
-		super();
-		this.towerDefenceActivity = TowerDefenceActivity;
-		loadResourses();
+		super(TowerDefenceActivity);
 		
 		
 		try {
 			scanner = new Scanner(towerDefenceActivity.getResources().getAssets().open(id + ".txt"));
 		} catch (IOException e) {
-			Log.e(tag, "scanner error", e);
+			Log.e(tag, "Scanner IOException", e);
 		}
 		
-		numColumns = scanner.nextInt();
-		numRows = scanner.nextInt();
-		startDirection = Direction.valueOf(scanner.next().trim());
+		loadProperties();		
+		loadBoard();
 		
+		setBackground(new Background(Color.RED));
+		
+		addMenue();
+		addCreeps();
+	}
+
+	private void loadBoard() {
 		backgroundTiles = new Cell[numRows][numColumns];
 		towers = new Tower[numRows][numColumns];
 		
 		screenWidth = towerDefenceActivity.getWindowManager().getDefaultDisplay().getWidth();
 		screenHeight = towerDefenceActivity.getWindowManager().getDefaultDisplay().getHeight();
 		
-		System.out.println("num columns: " + numColumns);
-		System.out.println("num rows: " + numRows);
-		System.out.println("startDirection: " + startDirection);
-		
 		for(int rowIndex = 0; rowIndex < numRows; rowIndex++) {
 			
 			String line = scanner.next().trim();
-			System.out.println("Line: " + line);
 			
 			String[] row = line.split(",");
 			
@@ -103,44 +93,44 @@ public class Level extends TowerDefenceScene implements KillListener{
 				
 				switch(row[colIndex].charAt(0)) {
 					case('u'): {
-						cell = new Cell(scale * colIndex * 32, scale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 						cell.setDirectionToNextRoad(Direction.UP);
 						attachChild(cell);
 						break;
 					}
 					case('r'): {
-						cell = new Cell(scale * colIndex * 32, scale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 						cell.setDirectionToNextRoad(Direction.RIGHT);
 						attachChild(cell);
 						break;
 					}
 					case('d'): {
-						cell = new Cell(scale * colIndex * 32, scale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 						cell.setDirectionToNextRoad(Direction.DOWN);
 						attachChild(cell);
 						break;
 					}
 					case('l'): {
-						cell = new Cell(scale * colIndex * 32, scale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 						cell.setDirectionToNextRoad(Direction.LEFT);
 						attachChild(cell);
 						break;
 					}
 					case('s'): {
-						cell = new Cell(scale * colIndex * 32, scale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 						cell.setDirectionToNextRoad(startDirection);
 						startCell = cell;
 						attachChild(cell);
 						break;
 					}
 					case('g'): {
-						cell = new Cell(scale * colIndex * 32, scale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, 32f, 32f, brownTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 						cell.setDirectionToNextRoad(Direction.LEFT);
 						attachChild(cell);
 						break;
 					}
 					case('x'): {
-						cell = new Cell(scale * colIndex * 32, scale * rowIndex * 32, 32f, 32f, greenTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, 32f, 32f, greenTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 						cell.setDirectionToNextRoad(Direction.LEFT);
 						cell.setTouchListener(new CellTouchListener(colIndex, rowIndex));
 						registerTouchArea(cell);
@@ -149,22 +139,23 @@ public class Level extends TowerDefenceScene implements KillListener{
 					}
 					case('t'): {
 						towers[rowIndex][colIndex] = new Tower(colIndex, rowIndex, 32f, 32f, towerTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), backgroundTiles, towerDefenceActivity);
-						cell = new Cell(scale * colIndex * 32, scale * rowIndex * 32, 32f, 32f, greenTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
+						cell = new Cell(boardScale * colIndex * 32, boardScale * rowIndex * 32, 32f, 32f, greenTextureRegion, towerDefenceActivity.getVertexBufferObjectManager(), true);
 						towers[rowIndex][colIndex].setPosition(cell);
 						attachChild(cell);
 						attachChild(towers[rowIndex][colIndex]);
 						break;
 					}
 				}
-				cell.setScale(scale);
+				cell.setScale(boardScale);
 				backgroundTiles[rowIndex][colIndex] = cell;
 			}
 		}
-		setBackground(new Background(Color.RED));
-		
-		addText();
-		addMenue();
-		addCreeps();
+	}
+
+	private void loadProperties() {
+		numColumns = scanner.nextInt();
+		numRows = scanner.nextInt();
+		startDirection = Direction.valueOf(scanner.next().trim());
 	}
 	
 	public class CellTouchListener implements TouchListener {
@@ -178,7 +169,6 @@ public class Level extends TowerDefenceScene implements KillListener{
 		}
 
 		public boolean handleTouch(IEntity entity) {
-			Log.d(tag, "THEY TOUCHED ME!!!!");
 			if(towerToAdd == null || towers[posY][posX] != null)
 				return false;
 			towerToAdd.setPosition(backgroundTiles[posY][posX]);
@@ -187,17 +177,11 @@ public class Level extends TowerDefenceScene implements KillListener{
 			towers[posY][posX] = towerToAdd;
 			attachChild(towerToAdd);
 			towerToAdd = null;
-			Log.d(tag, "User placed a new tower at x:"+posX+" y:"+posY);
 			return true;
 		}
 	}
 	
 	private void addMenue() {
-		exitToMain.setX(screenWidth - exitToMain.getWidth());
-		exitToMain.setY(screenHeight -exitToMain.getHeight() + 5);
-		registerTouchArea(exitToMain);
-		attachChild(exitToMain);
-		
 		menuTower = new Sprite(screenWidth - 64, 32, 32, 32, towerTextureRegion, towerDefenceActivity.getVertexBufferObjectManager()) {
 			@Override
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
@@ -227,8 +211,8 @@ public class Level extends TowerDefenceScene implements KillListener{
 			return false;
 		
 		towers[y][x] = tower;
-		tower.setX(x*scale*32);
-		tower.setY(y*scale*32);
+		tower.setX(x*boardScale*textureSize);
+		tower.setY(y*boardScale*textureSize);
 		attachChild(tower);
 		return true;
 	}
@@ -259,6 +243,7 @@ public class Level extends TowerDefenceScene implements KillListener{
 		Log.d(tag, "Creep detaqtched");
 	}
 	
+	@Override
 	public void loadResourses() {
 		// Load font texture
 		this.fontTexture = new BitmapTextureAtlas(towerDefenceActivity.getTextureManager(), 256,
@@ -302,10 +287,10 @@ public class Level extends TowerDefenceScene implements KillListener{
 	}
 	
 	private void addCreeps() {
-		creep = new Creep(scale* (numColumns-1) * 32, 0f, 32f, 32f, creepTextureRegion,
+		creep = new Creep(boardScale* (numColumns-1) * 32, 0f, 32f, 32f, creepTextureRegion,
 				towerDefenceActivity.getVertexBufferObjectManager(), this, this);
 		creep.setSpeed(-300f, 0f);
-		creep.setScale(scale - 0.1f);
+		creep.setScale(boardScale - 0.1f);
 		creep.registerUpdateHandler(new PathFinder(backgroundTiles[0].length-1, 0, creep));
 		startCell.addCreep(creep);
 		attachChild(creep);
@@ -325,7 +310,7 @@ public class Level extends TowerDefenceScene implements KillListener{
 		public void onUpdate(float pSecondsElapsed) {
 			switch(backgroundTiles[posY][posX].getDirectionToNextRoad()){
 			case LEFT :
-				float boundryLeft = (posX-1) * scale * 32;
+				float boundryLeft = (posX-1) * boardScale * 32;
 				if(creep.getX() < boundryLeft){
 					backgroundTiles[posY][posX--].removeCreep(creep);
 					backgroundTiles[posY][posX].addCreep(creep);
@@ -333,7 +318,7 @@ public class Level extends TowerDefenceScene implements KillListener{
 				}
 				break;
 			case DOWN :
-				float boundryDown = (posY+1) * scale * 32;
+				float boundryDown = (posY+1) * boardScale * 32;
 				if(creep.getY() > boundryDown){
 					backgroundTiles[posY++][posX].removeCreep(creep);
 					backgroundTiles[posY][posX].addCreep(creep);
@@ -341,7 +326,7 @@ public class Level extends TowerDefenceScene implements KillListener{
 				}
 				break;
 			case RIGHT :
-				float boundryRight = (posX+1) * scale * 32;
+				float boundryRight = (posX+1) * boardScale * 32;
 				if(creep.getX() > boundryRight){
 					backgroundTiles[posY][posX++].removeCreep(creep);
 					backgroundTiles[posY][posX].addCreep(creep);
@@ -349,7 +334,7 @@ public class Level extends TowerDefenceScene implements KillListener{
 				}
 				break;
 			case UP :
-				float boundryUp = (posY-1) * scale * 32 - 16;
+				float boundryUp = (posY-1) * boardScale * 32 - 16;
 				if(creep.getY() < boundryUp){
 					backgroundTiles[posY--][posX].removeCreep(creep);
 					backgroundTiles[posY][posX].addCreep(creep);
@@ -380,21 +365,5 @@ public class Level extends TowerDefenceScene implements KillListener{
 		}
 
 		public void reset() { }
-	}
-	
-	private void addText() {
-
-		// Level 1 text
-		exitToMain = new Text(200, 50, this.exitFont, towerDefenceActivity.getResources()
-				.getString(R.string.returnToMain),
-				towerDefenceActivity.getVertexBufferObjectManager()) {
-			@Override
-			public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
-					float pTouchAreaLocalX, float pTouchAreaLocalY) {
-				Log.d(tag, "Exiting StaticLevel1");
-				towerDefenceActivity.popState();
-				return true;
-			}
-		};
 	}
 }
