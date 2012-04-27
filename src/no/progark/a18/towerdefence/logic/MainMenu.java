@@ -5,8 +5,7 @@ import java.util.List;
 
 import no.progark.a18.towerdefence.R;
 import no.progark.a18.towerdefence.TowerDefenceActivity;
-import no.progark.a18.towerdefence.level.Level;
-import no.progark.a18.towerdefence.level.LevelFactory;
+import no.progark.a18.towerdefence.gameContent.LevelFactory;
 
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
@@ -106,7 +105,7 @@ public class MainMenu extends Scene {
 				public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
 						float pTouchAreaLocalX, float pTouchAreaLocalY) {
 					Log.d(TAG, "Level1 button, pushing level1");
-					TDA.pushState(new Level(TDA, levels[lvl]));
+					TDA.pushState(LevelFactory.getLevel(levels[lvl]));
 					return true;
 				}
 			};

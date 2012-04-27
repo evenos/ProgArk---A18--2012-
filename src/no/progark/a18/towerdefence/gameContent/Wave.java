@@ -3,7 +3,9 @@ package no.progark.a18.towerdefence.gameContent;
 import java.util.LinkedList;
 import java.util.List;
 
+import no.progark.a18.towerdefence.level.CreepKilledListener;
 import no.progark.a18.towerdefence.level.TowerDefenceScene;
+import no.progark.a18.towerdefence.level.WaveFinishedListener;
 
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.Entity;
@@ -31,10 +33,10 @@ public class Wave extends Entity {
 						fireWaveFinished();
 					}
 				});
-		registerUpdateHandler(setUpdatehandeler(creeps, spawnDelay, scene));
+		registerUpdateHandler(setCreepDispenserHandeler(creeps, spawnDelay, scene));
 	}
 
-	protected IUpdateHandler setUpdatehandeler(final List<Creep> creeps,
+	protected IUpdateHandler setCreepDispenserHandeler(final List<Creep> creeps,
 			final List<Float> spawnDelay, final TowerDefenceScene scene) {
 		return new IUpdateHandler() {
 			private long lastSent = System.currentTimeMillis();

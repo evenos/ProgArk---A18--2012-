@@ -6,12 +6,7 @@ import no.progark.a18.towerdefence.R;
 import no.progark.a18.towerdefence.TowerDefenceActivity;
 import no.progark.a18.towerdefence.gameContent.Cell;
 import no.progark.a18.towerdefence.gameContent.Creep;
-import no.progark.a18.towerdefence.gameContent.CreepEnteredCellListener;
-import no.progark.a18.towerdefence.gameContent.CreepKilledListener;
-import no.progark.a18.towerdefence.gameContent.Direction;
-import no.progark.a18.towerdefence.gameContent.PlayerInfo;
 import no.progark.a18.towerdefence.gameContent.Wave;
-import no.progark.a18.towerdefence.gameContent.WaveFinishedListener;
 
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.scene.Scene;

@@ -1,17 +1,12 @@
-package no.progark.a18.towerdefence.level;
+package no.progark.a18.towerdefence.gameContent;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import no.progark.a18.towerdefence.TowerDefenceActivity;
-import no.progark.a18.towerdefence.gameContent.Cell;
-import no.progark.a18.towerdefence.gameContent.Creep;
-import no.progark.a18.towerdefence.gameContent.Direction;
-import no.progark.a18.towerdefence.gameContent.TouchListener;
-import no.progark.a18.towerdefence.gameContent.Tower;
-import no.progark.a18.towerdefence.gameContent.TowerDefenceSprite;
-import no.progark.a18.towerdefence.gameContent.Wave;
+import no.progark.a18.towerdefence.level.Direction;
+import no.progark.a18.towerdefence.level.TowerDefenceScene;
 
 import org.andengine.entity.IEntity;
 import org.andengine.entity.scene.background.Background;

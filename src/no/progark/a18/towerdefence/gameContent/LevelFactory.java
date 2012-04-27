@@ -1,9 +1,10 @@
-package no.progark.a18.towerdefence.level;
+package no.progark.a18.towerdefence.gameContent;
 
 import org.andengine.entity.scene.Scene;
 import org.andengine.ui.activity.BaseGameActivity;
 
 import no.progark.a18.towerdefence.TowerDefenceActivity;
+import no.progark.a18.towerdefence.level.TowerDefenceScene;
 
 /**
  *Factory class for loading scenes
@@ -27,7 +28,7 @@ public class LevelFactory {
 	 * @param id the ID identifying the level
 	 * @return the loaded scene or null if non were found.
 	 */
-	public static Scene getLevel(String id) {
+	public static TowerDefenceScene getLevel(String id) {
 		if ("static".equals(id))
 			return new StaticLevel1(TDA);
 		else if(id != null)

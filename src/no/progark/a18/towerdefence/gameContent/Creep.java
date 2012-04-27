@@ -3,6 +3,8 @@ package no.progark.a18.towerdefence.gameContent;
 import java.util.LinkedList;
 import java.util.List;
 
+import no.progark.a18.towerdefence.level.CreepKilledListener;
+
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 

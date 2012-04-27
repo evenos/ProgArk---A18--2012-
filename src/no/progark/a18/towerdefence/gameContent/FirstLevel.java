@@ -1,4 +1,4 @@
-package no.progark.a18.towerdefence.level;
+package no.progark.a18.towerdefence.gameContent;
 
 import java.util.ArrayList;
 import java.util.List;

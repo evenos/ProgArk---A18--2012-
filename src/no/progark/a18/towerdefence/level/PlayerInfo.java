@@ -1,8 +1,4 @@
-package no.progark.a18.towerdefence.gameContent;
-
-import no.progark.a18.towerdefence.level.StaticLevel1;
-import no.progark.a18.towerdefence.level.TowerDefenceScene;
-
+package no.progark.a18.towerdefence.level;
 
 /**
  * Player values connected to the game
@@ -25,7 +21,7 @@ public class PlayerInfo {
 		this.level = level;
 	}
 	
-	public PlayerInfo(StaticLevel1 level){
+	public PlayerInfo(TowerDefenceScene level){
 		life=3;
 		this.level = level;
 	}
