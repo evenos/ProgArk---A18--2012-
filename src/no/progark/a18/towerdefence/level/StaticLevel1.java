@@ -17,7 +17,6 @@ import android.util.Log;
 
 import no.progark.a18.towerdefence.TowerDefenceActivity;
 import no.progark.a18.towerdefence.gameContent.Cell;
-import no.progark.a18.towerdefence.gameContent.Direction;
 import no.progark.a18.towerdefence.gameContent.Creep;
 import no.progark.a18.towerdefence.gameContent.TouchListener;
 import no.progark.a18.towerdefence.gameContent.Tower;
